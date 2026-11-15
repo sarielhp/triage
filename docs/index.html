@@ -20,7 +20,7 @@
     <main>
       <section class="hero" aria-labelledby="title">
         <div class="hero-heading">
-          <div><p class="eyebrow">C++17 &nbsp;/&nbsp; JULIA &nbsp;/&nbsp; MIT LICENSE</p><h1 id="title">Fast triangulation.<br><span>Original vertices.</span></h1></div>
+          <div><p class="eyebrow">C++17 &nbsp;/&nbsp; JULIA &nbsp;/&nbsp; MIT LICENSE</p><h1 id="title">Fast triangulation of polygons <span>(simple and with holes).</span></h1></div>
           <div class="hero-intro"><p>Simple polygons. Interior holes. No added points.</p><p>Triage combines three algorithms to handle small polygons and large geographic boundaries.</p><a class="button primary" href="https://github.com/sarielhp/triage">Explore the code <span aria-hidden="true">↗</span></a></div>
         </div>
         <figure class="wordmark">
@@ -250,7 +250,7 @@
       <section id="results" class="section" aria-labelledby="results-title">
         <div class="section-heading"><p class="eyebrow">02 / THE MEASUREMENTS</p><h2 id="results-title">Measured, with the<br>data to reproduce it.</h2></div>
         <p class="lead">Compared with <a href="https://github.com/mapbox/earcut.hpp">Mapbox Earcut</a> on identical prepared inputs. Times are milliseconds for a whole batch; lower is better.</p>
-        <div class="table-scroll" tabindex="0" role="region" aria-label="Benchmark results; scroll horizontally on small screens"><table><thead><tr><th scope="col">Corpus</th><th scope="col">Polygons</th><th scope="col">C++ Triage</th><th scope="col">Julia Triage</th><th scope="col">Earcut C++</th></tr></thead><tbody><tr><th scope="row">Single-ring tiles</th><td>111539</td><td>44.369</td><td>93.229</td><td>46.451</td></tr>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Benchmark results; scroll horizontally on small screens"><table><thead><tr><th scope="col">Corpus</th><th scope="col">Polygons</th><th scope="col">C++ Triage (ms)</th><th scope="col">Julia Triage (ms)</th><th scope="col">Earcut C++ (ms)</th></tr></thead><tbody><tr><th scope="row">Single-ring tiles</th><td>111539</td><td>44.369</td><td>93.229</td><td>46.451</td></tr>
 <tr><th scope="row">Holed tiles</th><td>5799</td><td>37.170</td><td>58.035</td><td>44.270</td></tr>
 <tr><th scope="row">Large geographic rings</th><td>19</td><td>224.932</td><td>272.317</td><td>855.080</td></tr>
 <tr><th scope="row">Geographic domains with holes</th><td>10</td><td>13.778</td><td>20.419</td><td>93.124</td></tr>
