@@ -1,0 +1,8 @@
+generated=1330 equal_x_skipped=23
+/tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/fixtures.bin checked=12
+/tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/geographic-holes.bin checked=0
+/tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/geographic-single.bin checked=0
+/tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/synthetic-holes.bin checked=28
+/tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/tiles-holes.bin checked=5799
+/tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/tiles-single.bin checked=111539
+PASS cases=118708 equal_x_skipped=23

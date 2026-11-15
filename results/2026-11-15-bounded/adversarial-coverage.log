@@ -1,0 +1,50 @@
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-1024.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-1024-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-1024.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-1024-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-1024.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-1024-cpp.bin
+PASS exact coverage: 1 domains
+PASS comb-1024: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-16384.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-16384-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-16384.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-16384-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-16384.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-16384-cpp.bin
+PASS exact coverage: 1 domains
+PASS comb-16384: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-256.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-256-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-256.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-256-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-256.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-256-cpp.bin
+PASS exact coverage: 1 domains
+PASS comb-256: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-4096.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-4096-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-4096.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-4096-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-4096.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-4096-cpp.bin
+PASS exact coverage: 1 domains
+PASS comb-4096: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-64.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-64-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-64.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-64-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/comb-64.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/comb-64-cpp.bin
+PASS exact coverage: 1 domains
+PASS comb-64: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-1024.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-1024-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-1024.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-1024-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-1024.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-1024-cpp.bin
+PASS exact coverage: 1 domains
+PASS stacked-holes-1024: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-16384.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-16384-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-16384.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-16384-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-16384.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-16384-cpp.bin
+PASS exact coverage: 1 domains
+PASS stacked-holes-16384: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-256.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-256-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-256.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-256-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-256.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-256-cpp.bin
+PASS exact coverage: 1 domains
+PASS stacked-holes-256: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-4096.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-4096-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-4096.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-4096-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-4096.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-4096-cpp.bin
+PASS exact coverage: 1 domains
+PASS stacked-holes-4096: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-64.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-64-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-64.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-64-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial/stacked-holes-64.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/adversarial-meshes/stacked-holes-64-cpp.bin
+PASS exact coverage: 1 domains
+PASS stacked-holes-64: C++/Julia byte-identical; no added vertices

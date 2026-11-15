@@ -12,6 +12,8 @@ Both APIs use the same fixed-size ear-cutting kernels for small inputs. On
 larger inputs, the bounded strategy replaces two potentially quadratic searches.
 It adds no vertices and has the same geometric and numerical input assumptions.
 
+See [measured C++/Julia performance and verification](../results/2026-11-15-bounded/README.md).
+
 ## Balanced sweep status
 
 The sweep still processes only local x extrema and resolves helper updates
@@ -100,8 +102,14 @@ ruby scripts/check_corpora.rb BUILD INPUTS OUTPUT_MESHES --bounded
 ruby scripts/time_corpora.rb BUILD INPUTS OUTPUT_TIMINGS --strategies
 julia scripts/prepare_adversarial.jl OUTPUT_ADVERSARIAL_INPUTS
 ruby scripts/check_corpora.rb BUILD OUTPUT_ADVERSARIAL_INPUTS OUTPUT_ADVERSARIAL_MESHES --bounded
-ruby scripts/time_corpora.rb BUILD OUTPUT_ADVERSARIAL_INPUTS OUTPUT_ADVERSARIAL_TIMINGS --strategies
+ruby scripts/time_corpora.rb BUILD OUTPUT_ADVERSARIAL_INPUTS OUTPUT_ADVERSARIAL_TIMINGS --triage-only
 ```
+
+Earcut is exceptionally slow on the largest stacked-hole cases, so the last
+command compares only the two Triage strategies in both languages. To also
+measure Earcut on a selected subset of inputs, use `--strategies` instead.
+`triage_bench validate-earcut INPUT unused` checks Earcut's output with the
+same independent exact coverage certificate.
 
 Use separate output directories for default/bounded meshes. Input preparation,
 compilation, exact certification, and instrumentation are outside timed runs.

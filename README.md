@@ -210,6 +210,27 @@ checked separately by the exact corpus validator.
 Source revisions, checksums, raw samples, eligibility ledgers, and logs:
 [results/2026-11-15](results/2026-11-15/README.md).
 
+### Optional bounded-time strategy
+
+The separate `triangulate_bounded` API is available on `main` (it postdates
+v0.1.0). A fresh comparison on the same machine and corpora gives these
+**whole-corpus median timings in milliseconds**, with 12 samples per method:
+
+| Corpus | C++ default (ms) | C++ bounded (ms) | Earcut C++ (ms) |
+|---|---:|---:|---:|
+| Single-ring tiles | 42.234 | 50.358 | 47.300 |
+| Holed tiles | 38.014 | 67.405 | 44.722 |
+| Large geographic rings | 231.396 | 401.063 | 853.812 |
+| Geographic domains with holes | 14.188 | 26.312 | 92.216 |
+| Accepted named fixtures | 0.717 | 0.774 | 0.646 |
+| Synthetic holed domains | 359.133 | 134.625 | 6393.211 |
+
+The bounded variant is slower on these geographic and tile batches, but
+2.67× faster on the synthetic-hole batch. It is an optional worst-case
+alternative; the default remains unchanged. See the
+[full C++/Julia results, adversarial cases, and verification](results/2026-11-15-bounded/README.md)
+and the [running-time argument](docs/bounded.md).
+
 
 ## Verification scope
 

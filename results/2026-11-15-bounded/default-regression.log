@@ -1,0 +1,6 @@
+PASS unchanged default: fixtures
+PASS unchanged default: geographic-holes
+PASS unchanged default: geographic-single
+PASS unchanged default: synthetic-holes
+PASS unchanged default: tiles-holes
+PASS unchanged default: tiles-single

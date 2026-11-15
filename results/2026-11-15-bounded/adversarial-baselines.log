@@ -1,0 +1,36 @@
+PASS exact coverage: 1 domains
+PASS default comb-1024.bin
+PASS Earcut exact coverage: 1 domains
+PASS Earcut comb-1024.bin
+PASS exact coverage: 1 domains
+PASS default comb-16384.bin
+PASS Earcut exact coverage: 1 domains
+PASS Earcut comb-16384.bin
+PASS exact coverage: 1 domains
+PASS default comb-256.bin
+PASS Earcut exact coverage: 1 domains
+PASS Earcut comb-256.bin
+PASS exact coverage: 1 domains
+PASS default comb-4096.bin
+PASS Earcut exact coverage: 1 domains
+PASS Earcut comb-4096.bin
+PASS exact coverage: 1 domains
+PASS default comb-64.bin
+PASS Earcut exact coverage: 1 domains
+PASS Earcut comb-64.bin
+PASS exact coverage: 1 domains
+PASS default stacked-holes-1024.bin
+PASS Earcut exact coverage: 1 domains
+PASS Earcut stacked-holes-1024.bin
+PASS exact coverage: 1 domains
+PASS default stacked-holes-16384.bin
+PASS exact coverage: 1 domains
+PASS default stacked-holes-256.bin
+PASS Earcut exact coverage: 1 domains
+PASS Earcut stacked-holes-256.bin
+PASS exact coverage: 1 domains
+PASS default stacked-holes-4096.bin
+PASS exact coverage: 1 domains
+PASS default stacked-holes-64.bin
+PASS Earcut exact coverage: 1 domains
+PASS Earcut stacked-holes-64.bin

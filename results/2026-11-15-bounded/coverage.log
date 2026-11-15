@@ -1,0 +1,41 @@
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/fixtures.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/fixtures-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/fixtures.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/fixtures-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/fixtures.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/fixtures-cpp.bin
+PASS exact coverage: 12 domains
+PASS fixtures: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/geographic-holes.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/geographic-holes-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/geographic-holes.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/geographic-holes-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/geographic-holes.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/geographic-holes-cpp.bin
+PASS exact coverage: 10 domains
+PASS geographic-holes: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/geographic-single.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/geographic-single-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/geographic-single.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/geographic-single-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/geographic-single.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/geographic-single-cpp.bin
+PASS exact coverage: 19 domains
+PASS geographic-single: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/synthetic-holes.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/synthetic-holes-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/synthetic-holes.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/synthetic-holes-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/synthetic-holes.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/synthetic-holes-cpp.bin
+PASS exact coverage: 36 domains
+PASS synthetic-holes: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/tiles-holes.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/tiles-holes-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/tiles-holes.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/tiles-holes-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/tiles-holes.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/tiles-holes-cpp.bin
+PASS exact coverage: 5799 domains
+PASS tiles-holes: C++/Julia byte-identical; no added vertices
+/tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/build/triage_bench dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/tiles-single.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/tiles-single-cpp.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl dump-bounded /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/tiles-single.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/tiles-single-julia.bin
+julia /home/sariel/papers/26/ai/triangulations/triage/scripts/julia_corpus.jl validate /tmp/sariel/triangulations/triage-release/20261115-132746-20261115-2-vhr9l8/inputs/tiles-single.bin /tmp/sariel/triage/bounded-strategy/20261115-145640-20261115-2-go2enb/meshes/tiles-single-cpp.bin
+validated 10000
+validated 20000
+validated 30000
+validated 40000
+validated 50000
+validated 60000
+validated 70000
+validated 80000
+validated 90000
+validated 100000
+validated 110000
+PASS exact coverage: 111539 domains
+PASS tiles-single: C++/Julia byte-identical; no added vertices
