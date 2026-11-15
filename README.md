@@ -1,5 +1,12 @@
 # Triage
 
+**Created using Codex. This project is the result of vibe programming.**
+
+[Project website](https://sarielhp.github.io/triage/) ·
+[Download the release](https://github.com/sarielhp/triage/releases/latest)
+
+[![TRIAGE as six letter-shaped holes in a rectangle, triangulated by Triage using only the original vertices.](docs/assets/triage-wordmark.svg)](https://sarielhp.github.io/triage/)
+
 Triage triangulates simple polygons with holes using **only the original vertices**.
 It includes a header-only C++17 library and a complete native Julia implementation.
 
@@ -206,7 +213,7 @@ Passing the **prepared valid subset** of the Earcut fixtures is not the same
 as passing Earcut's entire raw recovery suite. The ledgers preserve this
 distinction, including unsupported cases; no exclusions depend on timing.
 
-An [optional GitHub Actions template](ci/README.md) is included. Hosted CI is
+An [optional GitHub Actions template](ci/README.md) is included. Hosted test CI is
 not enabled in this initial release because the publication token lacks the
 `workflow` scope; the verification results above are local runs.
 

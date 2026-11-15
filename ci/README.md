@@ -6,5 +6,5 @@
 
 The initial publication token did not have GitHub's `workflow` OAuth scope.
 Consequently this release includes the configuration as an inactive template;
-GitHub-hosted CI has not run. The published verification results are from the
+GitHub-hosted test CI has not run. The published verification results are from the
 local reproducible tests, including sanitizers and the complete prepared corpus.
