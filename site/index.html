@@ -44,7 +44,7 @@
           <article><span class="method-number">03</span><h3>Larger inputs</h3><p>Sweep monotone chains, insert diagonals between original vertices, and triangulate compact boundary ranges.</p></article>
         </div>
         <p class="section-link"><a href="https://github.com/sarielhp/triage/blob/main/docs/algorithm.md">Read how chain-monotone triangulation works ↗</a></p>
-        <p class="lead">Also available in C++ and Julia: <code>triangulate_bounded</code>, a separate strategy with an O(n log n) worst-case time bound. The default stays unchanged. <a href="https://github.com/sarielhp/triage/blob/main/docs/bounded.md">Algorithm and comparison ↗</a></p>
+        <p class="lead">Also available in C++ and Julia: <code>triangulate_bounded</code>, a separate strategy with an O(n log n) worst-case time bound. It uses a balanced sweep status and sorted endpoint directions. It was 1.7–1.9× slower than the default on our C++ geographic batches, but substantially faster on adversarial inputs. The default stays unchanged. <a href="https://github.com/sarielhp/triage/blob/main/docs/bounded.md">Algorithm and comparison ↗</a></p>
       </section>
       <section id="results" class="section" aria-labelledby="results-title">
         <div class="section-heading"><p class="eyebrow">02 / THE MEASUREMENTS</p><h2 id="results-title">Measured, with the<br>data to reproduce it.</h2></div>
@@ -53,8 +53,20 @@
         <div class="benchmark-notes"><p><strong>The tradeoff:</strong> C++ Triage wins the tile and geographic batches in this run, but is about 2% slower on accepted named fixtures. Julia is competitive on large geometry and slower than Earcut on small tiles.</p><p>Intel Core i7-11700 · GCC 16.2 · Julia 1.13.3 · one thread · 12 warmed samples. Preparation is excluded. C++ and Julia were measured serially.</p></div>
         <a class="text-link" href="https://github.com/sarielhp/triage/tree/main/results/2026-11-15">Raw samples, input hashes, and verification logs ↗</a>
       </section>
+      <section id="worst-case" class="section" aria-labelledby="worst-case-title">
+        <div class="section-heading"><p class="eyebrow">03 / ADVERSARIAL INPUTS</p><h2 id="worst-case-title">Worst-case inputs.</h2></div>
+        <p class="lead">Two constructed families expose different weaknesses. These are stress tests, not a representative GIS workload or a claim to be the slowest possible inputs.</p>
+        <div class="benchmark-notes">
+          <article><h3>A comb: bad for default Triage</h3><p>A simple polygon with many teeth creates a large active set before earlier intervals disappear. Repeated scans cost quadratic time, even with no holes. The bounded strategy uses tree searches; Earcut finds easy local ears and wins on this family.</p></article>
+          <article><h3>Stacked holes: bad for Earcut</h3><p>A rectangle containing a vertical stack of small rectangular holes produces sharply increasing Earcut times. Quadrupling the hole count increases its measured time about 60–69×. This suggests cubic growth over these sizes; we have not proved an asymptotic lower bound or isolated the dominant internal stage.</p></article>
+        </div>
+        <p class="lead">C++ median timings in milliseconds for <strong>one domain</strong>, with 12 warmed samples. All reported outputs pass exact coverage checks. An exact dyadic shear resolves x-coordinate ties.</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Adversarial timings in milliseconds; scroll horizontally on small screens"><table><thead><tr><th scope="col">Domain</th><th scope="col">Vertices</th><th scope="col">Triage default (ms)</th><th scope="col">Triage bounded (ms)</th><th scope="col">Earcut (ms)</th></tr></thead><tbody>{{ADVERSARIAL_ROWS}}</tbody></table></div>
+        <p class="lead">The bounded variant is about 40× faster than default Triage on the largest comb, while Earcut remains much faster there. At 1,024 stacked holes, bounded Triage is about 512× faster than Earcut. The largest Earcut runs were stopped or omitted; no missing timings are extrapolated.</p>
+        <a class="text-link" href="https://github.com/sarielhp/triage#worst-case-inputs">Both families, all sizes, Julia results, and reproduction commands ↗</a>
+      </section>
       <section id="start" class="section" aria-labelledby="start-title">
-        <div class="section-heading"><p class="eyebrow">03 / GET STARTED</p><h2 id="start-title">Two implementations.<br>The same geometry.</h2></div>
+        <div class="section-heading"><p class="eyebrow">04 / GET STARTED</p><h2 id="start-title">Two implementations.<br>The same geometry.</h2></div>
         <div class="code-grid">
           <article class="code-card"><div class="code-title"><h3>C++17</h3><span>Header-only · Boost headers</span></div><pre><code>#include &lt;triage/triage.hpp&gt;
 
@@ -73,11 +85,12 @@ points = Point[
 triangles = triangulate(
     points, [1,5,8])</code></pre><p>One-based indices. Inline coordinate tuples.</p></article>
         </div>
+        <p class="lead">Call <code>triangulate_bounded</code> explicitly to select the optional strategy in either language. It is available on <a href="https://github.com/sarielhp/triage">main</a>; the earlier v0.1.0 release predates this API.</p>
         <div class="start-links"><a class="button primary" href="https://github.com/sarielhp/triage#cpp">Installation & documentation ↗</a><a class="button secondary" href="https://github.com/sarielhp/triage/releases/latest">Download the release ↗</a></div>
       </section>
       <section class="verification section" aria-labelledby="verification-title">
-        <div><p class="eyebrow">04 / CHECKS & SCOPE</p><h2 id="verification-title">Vibe programming.<br>Explicit verification.</h2><p>Created using Codex, with the algorithms, tests, scripts, and measurements available for inspection.</p></div>
-        <div class="verification-details"><p><strong>117,415 prepared domains.</strong> C++ and Julia output the same triangles, byte for byte. Independent exact-arithmetic checks certify orientation and boundary coverage. ASan/UBSan passed 118,708 generated and corpus cases.</p><p><strong>Input assumptions matter.</strong> Triage expects simple boundaries and disjoint interior holes. The current chain path requires distinct x coordinates. It does not implement Earcut’s malformed-input recovery, and adversarial inputs can incur quadratic work.</p><a href="https://github.com/sarielhp/triage#input-format">Read the input format and limitations ↗</a></div>
+        <div><p class="eyebrow">05 / CHECKS & SCOPE</p><h2 id="verification-title">Vibe programming.<br>Explicit verification.</h2><p>Created using Codex, with the algorithms, tests, scripts, and measurements available for inspection.</p></div>
+        <div class="verification-details"><p><strong>117,425 certified domains.</strong> The bounded C++ and Julia implementations produce byte-identical meshes on 117,415 corpus domains and ten adversarial domains. Independent exact-arithmetic checks certify orientation and boundary coverage. ASan/UBSan passed 118,708 generated and corpus cases. The default still reproduces every published corpus mesh.</p><p><strong>Input assumptions matter.</strong> Triage expects simple boundaries and disjoint interior holes. The current chain path requires distinct x coordinates. It does not implement Earcut’s malformed-input recovery. The default can incur quadratic work; the optional bounded strategy guarantees O(n log n) arithmetic operations under the same input assumptions.</p><a href="https://github.com/sarielhp/triage#input-format">Read the input format and limitations ↗</a></div>
       </section>
     </main>
     <footer><p>TRIAGE <span>© 2026 Sariel Har-Peled · MIT</span></p><a href="https://github.com/sarielhp/triage">GitHub repository ↗</a></footer>

@@ -21,7 +21,7 @@ boundaries and 6.8× faster for domains with holes** than
 see the [results and measurement conditions](#results), including smaller inputs
 and the Julia implementation.
 
-Both implementations use the same three-way dispatcher:
+Both implementations use the same three-way dispatcher by default:
 
 | Input | Algorithm |
 |---|---|
@@ -40,6 +40,8 @@ an **O(n + m log(m+1))** worst-case time bound, where n counts vertices and m
 counts x-monotone chains. This is O(n log n) in general. The default algorithm
 is unchanged; the bounded variant is a separate choice with additional overhead.
 See [the algorithm, bound, and reproduction commands](docs/bounded.md).
+The [worst-case input examples](#worst-case-inputs) show why we provide both
+strategies: their practical performance depends strongly on the geometry.
 
 ## C++
 
@@ -60,6 +62,8 @@ auto mesh = triage::triangulate(points, {0,4,7});
 
 For one ring, `triage::triangulate(points)` supplies its offsets.
 Coordinates are `std::array<double,2>` stored inline in one flat vector.
+Use `triage::triangulate_bounded(points, offsets)` to select the optional
+worst-case-bounded strategy explicitly; it returns the same result type.
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -94,13 +98,17 @@ triangles = triangulate(points, [1,5,8])
 # Vector{NTuple{3,Int}}, one-based original indices.
 ```
 
-To install from GitHub into your own Julia project:
+To install the current code, including the bounded strategy, from GitHub into
+your own Julia project:
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/sarielhp/triage", subdir="julia", rev="v0.1.0")
+Pkg.add(url="https://github.com/sarielhp/triage", subdir="julia", rev="main")
 using Triage
 ```
+
+Call `triangulate_bounded(points, offsets)` to select the optional strategy.
+The pinned `v0.1.0` release remains available but predates that API.
 
 Julia uses inline tuples for points, chains, intervals, and face records.
 Its exact fallback uses `Rational{BigInt}`. It uses the same forward-walking
@@ -231,6 +239,77 @@ alternative; the default remains unchanged. See the
 [full C++/Julia results, adversarial cases, and verification](results/2026-11-15-bounded/README.md)
 and the [running-time argument](docs/bounded.md).
 
+## Worst-case inputs
+
+The following adversarial families expose different weaknesses in default
+Triage and Earcut. They are deliberately constructed examples, not a
+representative GIS workload or a claim to be the slowest possible inputs.
+All timings below are **C++ milliseconds for one domain**, using the median
+of 12 warmed samples on the machine described above. Every reported mesh
+passes the independent exact coverage check.
+
+### A comb: bad for default Triage
+
+Take a simple polygon shaped like a comb, with many teeth extending to the
+right from a common spine. A small shear staggers the x extrema: indentations
+create new active intervals before earlier intervals disappear. There are
+**no holes**, but many simultaneously active chains.
+
+The default sweep scans its unsorted active intervals at every split event.
+For k indentations, this family makes it examine 1 + 2 + … + k intervals:
+quadratic work. Warm chain cursors avoid repeated walks along a chain, but
+do not avoid these repeated visits to different intervals. The bounded
+strategy replaces the scans with balanced-tree searches. The tooth tips
+also provide easy local ears, so Earcut performs especially well here.
+
+| Vertices | Triage default (ms) | Triage bounded (ms) | Earcut (ms) |
+|---:|---:|---:|---:|
+| 260 | 0.215 | 0.046 | 0.008 |
+| 1,028 | 1.144 | 0.278 | 0.033 |
+| 4,100 | 8.706 | 1.468 | 0.142 |
+| 16,388 | 100.671 | 7.216 | 0.612 |
+| 65,540 | 1452.159 | 36.163 | 2.774 |
+
+At 65,540 vertices, the bounded variant is **40× faster than default Triage**,
+but Earcut still wins decisively. A guaranteed bound does not imply the
+fastest implementation on every input.
+
+### Stacked rectangular holes: bad for Earcut
+
+Take a large rectangle and place a vertical stack of disjoint small rectangular
+holes inside it. An exact dyadic shear makes all x coordinates distinct without
+changing the domain's topology. This is the strongest adverse family for
+Earcut in these experiments.
+
+| Holes | Vertices | Triage default (ms) | Triage bounded (ms) | Earcut (ms) |
+|---:|---:|---:|---:|---:|
+| 64 | 260 | 0.572 | 0.240 | 0.667 |
+| 256 | 1,028 | 2.576 | 1.189 | 39.070 |
+| 1,024 | 4,100 | 14.105 | 5.260 | 2691.557 |
+| 4,096 | 16,388 | 110.292 | 22.852 | Not measured |
+| 16,384 | 65,540 | 1310.895 | 100.662 | Not measured |
+
+At 1,024 holes, bounded Triage is about **512× faster than Earcut**. Across
+the first three sizes, multiplying the hole count by four increases Earcut's
+time by about 60–69×. This suggests roughly cubic growth over the measured
+range; it is **not a proved asymptotic lower bound** for Earcut. We have not
+isolated whether hole joining or subsequent ear clipping dominates.
+
+The 16,384-hole Earcut warmup was interrupted, and its incomplete result is
+excluded. The 4,096-hole run was omitted after observing the smaller case's
+cost. Both Triage strategies were measured at every listed size; no Earcut
+times are extrapolated.
+
+These examples explain the choice of APIs: `triangulate` keeps the lower
+overhead that works well on our geographic benchmarks; `triangulate_bounded`
+provides an O(n log n) worst-case alternative. Both use only original vertices.
+
+Generate the exact test families with
+[`scripts/prepare_adversarial.jl`](scripts/prepare_adversarial.jl). The
+[reproduction commands](docs/bounded.md#usage-and-reproduction) include a
+`--triage-only` option to avoid the expensive Earcut runs. Full Julia results,
+raw samples, input hashes, and coverage logs are in the
+[adversarial comparison](results/2026-11-15-bounded/README.md#adversarial-inputs).
 
 ## Verification scope
 
