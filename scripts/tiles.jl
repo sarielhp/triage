@@ -37,8 +37,8 @@ function decode_rings(geometry)
         end
         command in (1, 2) || error("unknown MVT command $command")
         for _ in 1:count
-            x += zigzag(geometry[i]);
-            y += zigzag(geometry[i+1]);
+            x += zigzag(geometry[i])
+            y += zigzag(geometry[i+1])
             i += 2
             if command == 1
                 isempty(ring) || push!(rings, ring)
@@ -55,7 +55,7 @@ function group_rings!(polygons, rings, zoom)
     current = Vector{Tuple{Int,Int}}[]
     for ring in rings
         length(ring) >= 3 || continue
-        area = sum(a[1]*b[2]-a[2]*b[1] for (a,b) in zip(ring,circshift(ring,-1)))
+        area = sum(a[1]*b[2]-a[2]*b[1] for (a, b) in zip(ring, circshift(ring, -1)))
         area == 0 && continue
         if area > 0
             isempty(current) || push!(polygons, TilePolygon(current, zoom))
@@ -82,4 +82,3 @@ function decode_tiles(path)
     length(polygons) == 119680 || error("decoder mismatch: $(length(polygons)) polygons")
     polygons
 end
-

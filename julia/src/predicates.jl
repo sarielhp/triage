@@ -33,5 +33,5 @@ end
 @inline function contains(a, b, c, q)
     min(a[1], b[1], c[1]) <= q[1] <= max(a[1], b[1], c[1]) || return false
     min(a[2], b[2], c[2]) <= q[2] <= max(a[2], b[2], c[2]) || return false
-    return turn(a,b,q) >= 0 && turn(b,c,q) >= 0 && turn(c,a,q) >= 0
+    return turn(a, b, q) >= 0 && turn(b, c, q) >= 0 && turn(c, a, q) >= 0
 end

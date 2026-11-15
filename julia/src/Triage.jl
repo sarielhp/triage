@@ -32,7 +32,8 @@ function triangulate(points::Vector{Point}, offsets::Vector{Int} = [1, length(po
 end
 
 function check_shape(points, offsets)
-    length(points) >= 3 && length(offsets) >= 2 || throw(ArgumentError("invalid polygon shape"))
+    length(points) >= 3 && length(offsets) >= 2 ||
+        throw(ArgumentError("invalid polygon shape"))
     first(offsets) == 1 && last(offsets) == length(points)+1 ||
         throw(ArgumentError("invalid ring offsets"))
     all(i -> 3 <= offsets[i]-offsets[i-1] <= length(points), 2:length(offsets)) ||

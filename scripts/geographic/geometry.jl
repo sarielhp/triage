@@ -136,9 +136,9 @@ end
 
 function read_points(path)
     open(path) do io
-        n = Int(read(io,UInt64))
-        coordinates = read!(io,Vector{Float64}(undef,2n))
+        n = Int(read(io, UInt64))
+        coordinates = read!(io, Vector{Float64}(undef, 2n))
         eof(io) || error("trailing input bytes")
-        return [(coordinates[2i-1],coordinates[2i]) for i in 1:n]
+        return [(coordinates[2i-1], coordinates[2i]) for i in 1:n]
     end
 end
