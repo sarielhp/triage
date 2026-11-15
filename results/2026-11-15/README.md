@@ -1,7 +1,8 @@
 # Release measurements, 2026-11-15
 
 Measured code revision: `3133f424f5bf6cfadbe3d6fba2fab5ecf48bf68d`.
-Later release changes affect orchestration/documentation only; exact measured
+The equivalent published code revision is `e9a6a15f93b80dc051b078a38edbcd8187f8de15` (the inactive
+CI template was relocated for publication). Later release changes affect orchestration/documentation only; exact measured
 library and benchmark source hashes are in [source-sha256.txt](source-sha256.txt).
 
 - [Summary CSV](timings/summary.csv), [environment](timings/environment.json).

@@ -199,6 +199,10 @@ Passing the **prepared valid subset** of the Earcut fixtures is not the same
 as passing Earcut's entire raw recovery suite. The ledgers preserve this
 distinction, including unsupported cases; no exclusions depend on timing.
 
+An [optional GitHub Actions template](ci/README.md) is included. Hosted CI is
+not enabled in this initial release because the publication token lacks the
+`workflow` scope; the verification results above are local runs.
+
 ## Sources and licensing
 
 Triage: MIT, copyright 2026 Sariel Har-Peled. See [LICENSE](LICENSE).

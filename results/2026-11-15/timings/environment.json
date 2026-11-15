@@ -16,5 +16,6 @@
   "cpu_model": "Intel Core i7-11700 @ 2.50GHz",
   "cpp_flags": "-O3 -DNDEBUG -ffp-contract=off",
   "boost": "1.92.0",
-  "julia_threads": 1
+  "julia_threads": 1,
+  "published_equivalent_revision": "e9a6a15f93b80dc051b078a38edbcd8187f8de15"
 }
