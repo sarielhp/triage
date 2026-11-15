@@ -34,12 +34,16 @@ def full_run(work, build, with_geography, sanitize)
   geography(work, downloads, inputs, records) if with_geography
   run!(File.join(build, 'triage_test'), *Dir.glob(File.join(inputs, '*.bin')))
   run!('ruby', File.join(ROOT, 'scripts/check_corpora.rb'), build, inputs, File.join(work, 'meshes'))
+  if ARGV.include?('--strategies')
+    run!('ruby', File.join(ROOT, 'scripts/check_corpora.rb'), build, inputs, File.join(work, 'bounded-meshes'), '--bounded')
+  end
   return if sanitize # Instrumented runs check correctness, never performance.
 
-  run!('ruby', File.join(ROOT, 'scripts/time_corpora.rb'), build, inputs, File.join(work, 'timings'))
+  comparison = ARGV.include?('--strategies') ? ['--strategies'] : []
+  run!('ruby', File.join(ROOT, 'scripts/time_corpora.rb'), build, inputs, File.join(work, 'timings'), *comparison)
 end
 
-unknown = ARGV - %w[--full --geography --sanitize]
+unknown = ARGV - %w[--full --geography --sanitize --strategies]
 abort "unknown options: #{unknown.join(' ')}" unless unknown.empty?
 
 work = ProjectTmp.mktmpdir('verification')

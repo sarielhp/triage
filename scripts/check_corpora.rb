@@ -10,16 +10,18 @@ def run!(*args)
   system(*args) || raise("command failed: #{args.first}")
 end
 
-abort 'usage: check_corpora.rb BUILD INPUTS OUTPUT' unless ARGV.length == 3
+bounded = ARGV.delete('--bounded')
+abort 'usage: check_corpora.rb BUILD INPUTS OUTPUT [--bounded]' unless ARGV.length == 3
 build, inputs, output = ARGV.map { |path| File.expand_path(path) }
 FileUtils.mkdir_p(output)
 executable = File.join(build, 'triage_bench')
+action = bounded ? 'dump-bounded' : 'dump'
 Dir.glob(File.join(inputs, '*.bin')).each do |input|
   label = File.basename(input, '.bin')
   cpp = File.join(output, "#{label}-cpp.bin")
   julia = File.join(output, "#{label}-julia.bin")
-  run!(executable, 'dump', input, cpp)
-  run!('julia', File.join(ROOT, 'scripts/julia_corpus.jl'), 'dump', input, julia)
+  run!(executable, action, input, cpp)
+  run!('julia', File.join(ROOT, 'scripts/julia_corpus.jl'), action, input, julia)
   raise "C++/Julia disagreement: #{label}" unless Digest::SHA256.file(cpp) == Digest::SHA256.file(julia)
 
   # Independent exact arithmetic checks every triangle and boundary edge.

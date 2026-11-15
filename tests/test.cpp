@@ -17,6 +17,16 @@ void check_chain(const Polygon& p) {
         const auto result=dd::triangulate_chain_monotone<dd::ChainSearch::Gallop,true>(p.points,p.offsets,&stats);
         certify(p,result);
         certify(p,dd::triangulate(p.points,p.offsets));
+        std::vector<std::pair<dd::Index,dd::Index>> balanced_diagonals;
+        dd::ChainMonotoneStats balanced_stats;
+        const auto balanced=dd::triangulate_chain_monotone<dd::ChainSearch::Walk,true,true>(
+            p.points,p.offsets,&balanced_stats,&balanced_diagonals);
+        certify(p,balanced);
+        certify(p,dd::triangulate_bounded(p.points,p.offsets));
+        for (auto& d:balanced_diagonals) if (d.first>d.second) std::swap(d.first,d.second);
+        std::sort(balanced_diagonals.begin(),balanced_diagonals.end());
+        require(balanced_diagonals==reference,"balanced status changes partition diagonals");
+        require(balanced_stats.advances<=p.points.size(),"balanced cursor revisits edges");
         const auto walk=dd::triangulate_chain_monotone<dd::ChainSearch::Walk>(p.points,p.offsets);
         const auto binary=dd::triangulate_chain_monotone<dd::ChainSearch::Binary>(p.points,p.offsets);
         require(walk.triangles==result.triangles && binary.triangles==result.triangles,"search mode changes triangulation");
@@ -58,9 +68,25 @@ void check_cursors() {
         }
     }
 }
+void check_fan_topology() {
+    // Many diagonals share one endpoint: this exercises the second possible
+    // quadratic cost independently of the sweep-status data structure.
+    for (unsigned n:{16u,128u,4096u}) {
+        Polygon p; p.offsets={0,n};
+        for (unsigned i=0;i<n;++i) p.points.push_back({double(i),double(i)*i});
+        std::vector<dd::Index> marks(n); std::iota(marks.begin(),marks.end(),0);
+        std::vector<std::pair<dd::Index,dd::Index>> diagonals;
+        for (unsigned i=2;i+1<n;++i) diagonals.emplace_back(0,i);
+        for (bool reverse:{false,true}) {
+            if (reverse) std::reverse(diagonals.begin(),diagonals.end());
+            dd::chain_monotone_detail::Faces faces(p.points,p.offsets,marks);
+            faces.build_sorted(diagonals); certify(p,faces.run());
+        }
+    }
+}
 int main(int argc,char** argv) {
     try {
-        check_cursors(); std::mt19937 rng(15152026);
+        check_cursors(); check_fan_topology(); std::mt19937 rng(15152026);
         for (unsigned holes=0;holes<=20;++holes) for (unsigned repeat=0;repeat<20;++repeat) {
             Polygon p; p.offsets.push_back(0); ring(p,radial(4+repeat%17,15,15,80,false,rng),repeat);
             for (unsigned h=0;h<holes;++h) ring(p,radial(3+(repeat+h)%6,10*(h%5),10*(h/5),2,true,rng),repeat+h);

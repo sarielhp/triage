@@ -34,6 +34,13 @@ boundary chain, and triangulates compact lists of original-boundary ranges.
 It never constructs ray-intersection vertices. See [the algorithm](docs/algorithm.md).
 There is no Earcut fallback. Earcut is included **only for comparison**.
 
+An optional **`triangulate_bounded`** function is also available in C++ and
+Julia. It uses a balanced sweep status and sorted endpoint directions to give
+an **O(n + m log(m+1))** worst-case time bound, where n counts vertices and m
+counts x-monotone chains. This is O(n log n) in general. The default algorithm
+is unchanged; the bounded variant is a separate choice with additional overhead.
+See [the algorithm, bound, and reproduction commands](docs/bounded.md).
+
 ## C++
 
 Requires GCC or Clang with C++17 and Boost headers (1.65+). No compiled Boost
@@ -121,9 +128,10 @@ same prepared coordinates. Preparation is excluded from triangulation timings.
 This release does not implement recovery for self-intersections, touching rings,
 point holes, or the other malformed inputs accepted by Earcut's recovery logic.
 
-The active interval structure is an unsorted array. Split-event scans and
+The default active interval structure is an unsorted array. Split-event scans and
 endpoint-occurrence searches can be quadratic on adversarial inputs; this is
 an engineering implementation, not a claim of worst-case optimal triangulation.
+Use `triangulate_bounded` for the optional O(n log n) worst-case alternative.
 
 ## Reproduce tests and timings
 

@@ -2,6 +2,8 @@
 #include "small.hpp"
 #include <chrono>
 #include <numeric>
+#include <set>
+#include <type_traits>
 #include <utility>
 
 namespace triage {
@@ -54,7 +56,7 @@ Index seek(Chain& c,double x,const std::vector<Point>& p,ChainMonotoneStats* sta
     return lo;
 }
 
-template<ChainSearch Mode,bool Measure=false>
+template<ChainSearch Mode,bool Measure=false,bool Balanced=false>
 class Sweep {
     const std::vector<Point>& p_;
     const std::vector<Index>& offsets_;
@@ -66,6 +68,32 @@ class Sweep {
     std::vector<Interval> intervals_;
     std::vector<Index> active_,owner_;
     std::vector<std::pair<Index,Index>> diagonals_;
+    double sweep_x_=0;
+    struct Probe { Index vertex; };
+    struct StatusLess {
+        using is_transparent=void;
+        Sweep* sweep;
+        bool operator()(Index a,Index b) const { return sweep->lower_than(a,b); }
+        bool operator()(Index a,Probe b) const { return sweep->below_point(a,b.vertex); }
+        bool operator()(Probe a,Index b) const { return !sweep->below_point(b,a.vertex); }
+    };
+    struct EmptyStatus { explicit EmptyStatus(StatusLess) {} };
+    std::conditional_t<Balanced,std::set<Index,StatusLess>,EmptyStatus> status_{StatusLess{this}};
+    // Live lower chains never cross. Their order is invariant while sweep_x_
+    // changes; only insertion/removal changes the set. Queries advance fingers.
+    bool lower_than(Index i,Index j) {
+        if (i==j) return false;
+        if constexpr (Measure) ++stats_->status_visits;
+        const Index c=intervals_[i].low,d=intervals_[j].low;
+        const Index k=predecessor(c,sweep_x_),l=predecessor(d,sweep_x_);
+        const Index a=at(c,k),b=at(d,l);
+        return p_[a][0]<p_[b][0]?turn(a,at(c,k+1),b)>0:turn(b,at(d,l+1),a)<0;
+    }
+    bool below_point(Index i,Index v) {
+        if constexpr (Measure) ++stats_->status_visits;
+        const Index c=intervals_[i].low,k=predecessor(c,sweep_x_);
+        return turn(at(c,k),at(c,k+1),v)>0;
+    }
     Index at(Index c,Index k) const { return vertex(chains_[c],k); }
     Index predecessor(Index c,double x) { return seek<Mode,Measure>(chains_[c],x,p_,stats_); }
     int turn(Index a,Index b,Index c) const { return orient_original(p_[a],p_[b],p_[c]); }
@@ -83,10 +111,16 @@ class Sweep {
         }
         intervals_.push_back({low,high,helper,next,static_cast<Index>(active_.size()),pending});
         active_.push_back(id); owner_[low]=owner_[high]=id;
+        if constexpr (Balanced) {
+            if (!status_.insert(id).second) throw std::runtime_error("duplicate status boundary");
+        }
         if constexpr (Measure) stats_->max_active=std::max(stats_->max_active,active_.size());
         return id;
     }
     void remove(Index id) {
+        if constexpr (Balanced) {
+            if (status_.erase(id)!=1) throw std::runtime_error("missing status boundary");
+        }
         const Index slot=intervals_[id].slot,last=active_.back(); active_.pop_back();
         if (slot<active_.size()) { active_[slot]=last; intervals_[last].slot=slot; }
     }
@@ -109,6 +143,11 @@ class Sweep {
         if (intervals_[id].pending) add_diagonal(v,intervals_[id].helper);
     }
     Index below(Index v) {
+        if constexpr (Balanced) {
+            auto it=status_.lower_bound(Probe{v});
+            if (it==status_.begin()) throw std::runtime_error("missing sweep interval");
+            return *--it;
+        }
         Index best=none,ba=none,bb=none;
         for (const Index id:active_) {
             if constexpr (Measure) ++stats_->status_visits;
@@ -124,6 +163,8 @@ class Sweep {
 public:
     Sweep(const std::vector<Point>& p,const std::vector<Index>& o,ChainMonotoneStats* stats)
         :p_(p),offsets_(o),stats_(stats) {}
+    Sweep(const Sweep&)=delete;
+    Sweep& operator=(const Sweep&)=delete;
     void prepare() {
         if (p_.size()<3 || p_.size()>=none || offsets_.size()<2 || offsets_.front()!=0 || offsets_.back()!=p_.size())
             throw std::invalid_argument("invalid chain-monotone input shape");
@@ -160,6 +201,7 @@ public:
     }
     void run() {
         for (const auto& e:events_) {
+            if constexpr (Balanced) sweep_x_=p_[e.v][0];
             const Index positive=chains_[e.out].forward?e.out:e.in;
             const Index negative=chains_[e.out].forward?e.in:e.out;
             if (e.kind==1) fresh(positive,negative,e.v,false);
@@ -301,6 +343,58 @@ public:
         }
         for (const auto& d:diagonals) diagonal(d.first,d.second);
     }
+    // Offline rotation system: boundary ranges and partition diagonals form a
+    // planar graph. Sort outgoing tangents, then take the clockwise predecessor
+    // of the incoming twin to follow the face on the left. Reverse boundary
+    // ranges belong to the exterior/hole faces and are marked seen initially.
+    void build_sorted(const std::vector<std::pair<Index,Index>>& diagonals) {
+        if (marks_.size()+diagonals.size()>=none/2)
+            throw std::invalid_argument("too many sorted face records");
+        nodes_.reserve(2*(marks_.size()+diagonals.size()));
+        std::vector<Index> tangent;
+        tangent.reserve(2*(marks_.size()+diagonals.size()));
+        auto edge=[&](Index a,Index b,Index ta,Index tb,Index ring,bool boundary) {
+            const Index u=nodes_.size(),v=u+1;
+            nodes_.push_back({a,none,none,v,ring,boundary,false});
+            nodes_.push_back({b,none,none,u,ring,false,boundary});
+            tangent.push_back(ta); tangent.push_back(tb);
+        };
+        Index start=0;
+        for (Index r=0;r+1<offsets_.size();++r) {
+            Index end=start;
+            while (end<marks_.size() && marks_[end]<offsets_[r+1]) ++end;
+            if (end-start<2) throw std::runtime_error("missing ring marks");
+            for (Index i=start;i<end;++i) {
+                const Index a=marks_[i],b=marks_[i+1==end?start:i+1];
+                edge(a,b,next_original(a,r),prev_original(b,r),r,true);
+            }
+            start=end;
+        }
+        for (const auto& d:diagonals) edge(d.first,d.second,d.second,d.first,0,false);
+        std::vector<Index> order(nodes_.size());
+        std::iota(order.begin(),order.end(),0);
+        auto upper=[&](Index a,Index b) {
+            return p_[b][1]>p_[a][1] || (p_[b][1]==p_[a][1] && p_[b][0]>p_[a][0]);
+        };
+        std::sort(order.begin(),order.end(),[&](Index a,Index b) {
+            const Index v=nodes_[a].id,w=nodes_[b].id;
+            if (v!=w) return v<w;
+            const bool ah=upper(v,tangent[a]),bh=upper(v,tangent[b]);
+            if (ah!=bh) return ah>bh;
+            const int side=turn(v,tangent[a],tangent[b]);
+            return side!=0?side>0:a<b;
+        });
+        for (Index begin=0;begin<order.size();) {
+            Index end=begin+1;
+            while (end<order.size() && nodes_[order[end]].id==nodes_[order[begin]].id) ++end;
+            for (Index j=begin;j<end;++j) {
+                const Index incoming=nodes_[order[j]].alias;
+                const Index outgoing=order[j==begin?end-1:j-1];
+                nodes_[incoming].next=outgoing; nodes_[outgoing].prev=incoming;
+            }
+            begin=end;
+        }
+    }
     Result run(ChainMonotoneStats* stats=nullptr) {
         result_.triangles.reserve(p_.size()+2*(offsets_.size()-2)-2); stack_.reserve(64);
         std::size_t faces=0;
@@ -326,18 +420,20 @@ public:
 };
 }
 
-template<ChainSearch Mode=ChainSearch::Gallop,bool Measure=false>
+template<ChainSearch Mode=ChainSearch::Gallop,bool Measure=false,bool Balanced=false>
 Result triangulate_chain_monotone(const std::vector<Point>& p,const std::vector<Index>& offsets,
     ChainMonotoneStats* stats=nullptr,std::vector<std::pair<Index,Index>>* diagonals=nullptr) {
     using Clock=std::chrono::steady_clock;
     Clock::time_point before;
     if constexpr (Measure) { if (!stats) throw std::invalid_argument("stats required"); *stats={}; before=Clock::now(); }
-    chain_monotone_detail::Sweep<Mode,Measure> sweep(p,offsets,stats); sweep.prepare();
+    chain_monotone_detail::Sweep<Mode,Measure,Balanced> sweep(p,offsets,stats); sweep.prepare();
     if constexpr (Measure) { const auto now=Clock::now(); stats->prepare_seconds=std::chrono::duration<double>(now-before).count(); before=now; }
     sweep.run();
     if constexpr (Measure) { const auto now=Clock::now(); stats->sweep_seconds=std::chrono::duration<double>(now-before).count(); before=now; stats->workspace_capacity_bytes=sweep.capacity_bytes(); }
     if (diagonals) *diagonals=sweep.diagonals();
-    chain_monotone_detail::Faces faces(p,offsets,sweep.marks()); faces.build(sweep.diagonals());
+    chain_monotone_detail::Faces faces(p,offsets,sweep.marks());
+    if constexpr (Balanced) faces.build_sorted(sweep.diagonals());
+    else faces.build(sweep.diagonals());
     if constexpr (Measure) { const auto now=Clock::now(); stats->topology_seconds=std::chrono::duration<double>(now-before).count(); before=now; }
     auto result=faces.run(Measure?stats:nullptr);
     if constexpr (Measure) stats->triangulate_seconds=std::chrono::duration<double>(Clock::now()-before).count();

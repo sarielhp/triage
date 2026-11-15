@@ -102,6 +102,11 @@ There is no general half-edge graph or sort of incident directions. The
 integer sort orders marks along their original rings; sector tests resolve
 only endpoint occurrences created by previous diagonals.
 
+The optional `triangulate_bounded` entry point replaces both status scans and
+endpoint-occurrence scans. It retains the chain sweep, helper rules, and
+streaming monotone triangulation. See [the bounded strategy](bounded.md) for
+its data structures and running-time argument. The default remains unchanged.
+
 All extrema are marked, so each original range is x-monotone. Find the leftmost
 and rightmost marked occurrences of each final face. A forward iterator and
 a backward iterator traverse its two boundary chains directly in the original

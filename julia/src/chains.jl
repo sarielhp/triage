@@ -12,7 +12,7 @@ struct SweepEvent
     incoming::Int
     kind::Int
 end
-mutable struct Sweep
+mutable struct Sweep{S}
     p::Vector{Point}
     offsets::Vector{Int}
     chains::Vector{Chain}
@@ -22,6 +22,7 @@ mutable struct Sweep
     active::Vector{Int}
     owner::Vector{Int}
     diagonals::Vector{Tuple{Int,Int}}
+    status::S
 end
 
 @inline function vertex(c::Chain, k)
@@ -76,7 +77,7 @@ function link_chains!(s, start, first, last)
     return nothing
 end
 
-function prepare_sweep(p, o)
+function prepare_sweep(p, o, status = nothing)
     check_shape(p, o)
     all(q -> all(isfinite, q) && max(abs(q[1]), abs(q[2])) < 1e12, p) ||
         throw(ArgumentError("finite bounded coordinates required"))
@@ -90,6 +91,7 @@ function prepare_sweep(p, o)
         Int[],
         Int[],
         Tuple{Int,Int}[],
+        status,
     )
     for r in 1:(length(o)-1)
         ring_events!(s, o[r], o[r+1]-1)
@@ -100,7 +102,11 @@ function prepare_sweep(p, o)
     fill!(s.owner, 0)
     sizehint!(s.intervals, length(s.events))
     sizehint!(s.diagonals, length(s.events)÷2)
-    sort!(s.events; by = e -> p[e.v][1])
+    if isnothing(status)
+        sort!(s.events; by = e -> p[e.v][1])
+    else
+        sort!(s.events; by = e -> p[e.v][1], alg = MergeSort)
+    end
     all(i -> p[s.events[i-1].v][1] != p[s.events[i].v][1], 2:length(s.events)) ||
         throw(ArgumentError("distinct extremum x required"))
     return s
@@ -123,10 +129,12 @@ function fresh!(s, low, high, helper, pending)
     push!(s.intervals, (low, high, helper, next, length(s.active)+1, Int(pending)))
     push!(s.active, id)
     s.owner[low] = s.owner[high] = id
+    status_insert!(s, id)
     return id
 end
 
 function remove!(s, id)
+    status_remove!(s, id)
     slot = s.intervals[id][5]
     last = pop!(s.active)
     if slot <= length(s.active)
@@ -159,7 +167,11 @@ function finish!(s, id, v)
     return nothing
 end
 
-function below!(s, v)
+status_insert!(s::Sweep{Nothing}, id) = nothing
+status_remove!(s::Sweep{Nothing}, id) = nothing
+status_event!(s::Sweep{Nothing}, v) = nothing
+
+function below!(s::Sweep{Nothing}, v)
     best, ba, bb = 0, 0, 0
     for id in s.active
         c = s.intervals[id][1]
@@ -200,6 +212,7 @@ end
 
 function sweep!(s)
     for e in s.events
+        status_event!(s, e.v)
         positive = s.chains[e.out].forward ? e.out : e.incoming
         negative = s.chains[e.out].forward ? e.incoming : e.out
         if e.kind == 1

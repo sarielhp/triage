@@ -38,10 +38,14 @@ def metadata(inputs)
   { utc: Time.now.utc.to_s, revision: revision.strip, julia: julia.strip,
     compiler: compiler.lines.first&.strip, system: cpu.strip,
     affinity_cpu: ENV.fetch('TRIAGE_CPU', nil),
-    inputs: inputs.to_h { |p| [File.basename(p), Digest::SHA256.file(p).hexdigest] } }
+    inputs: inputs.to_h { |p| [File.basename(p), Digest::SHA256.file(p).hexdigest] },
+    sources: Dir.glob(File.join(ROOT, '{include,julia/src,bench,tests,scripts}/**/*'))
+                .select { |p| File.file?(p) }
+                .to_h { |p| [p.delete_prefix("#{ROOT}/"), Digest::SHA256.file(p).hexdigest] } }
 end
 
-abort 'usage: time_corpora.rb BUILD INPUTS OUTPUT' unless ARGV.length == 3
+strategies = ARGV.delete('--strategies')
+abort 'usage: time_corpora.rb BUILD INPUTS OUTPUT [--strategies]' unless ARGV.length == 3
 build, inputs, output = ARGV.map { |path| File.expand_path(path) }
 FileUtils.mkdir_p(output)
 paths = Dir.glob(File.join(inputs, '*.bin'))
@@ -50,12 +54,13 @@ raise 'no input corpora' if paths.empty?
 prefix = ENV.key?('TRIAGE_CPU') ? ['taskset', '-c', ENV.fetch('TRIAGE_CPU')] : []
 File.write(File.join(output, 'environment.json'), JSON.pretty_generate(metadata(paths)))
 measurements = []
+action = strategies ? 'bench-strategies' : 'bench'
 paths.each do |input|
   label = File.basename(input, '.bin')
   cpp = File.join(output, "#{label}-cpp.csv")
   julia = File.join(output, "#{label}-julia.csv")
-  run!(*prefix, File.join(build, 'triage_bench'), 'bench', input, cpp)
-  run!(*prefix, 'julia', File.join(ROOT, 'scripts/julia_corpus.jl'), 'bench', input, julia)
+  run!(*prefix, File.join(build, 'triage_bench'), action, input, cpp)
+  run!(*prefix, 'julia', File.join(ROOT, 'scripts/julia_corpus.jl'), action, input, julia)
   measurements.push([label, cpp], [label, julia])
 end
 summarize(measurements, output)
