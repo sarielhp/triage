@@ -1,0 +1,6 @@
+/build*/
+/data/downloads/
+/data/prepared/
+/results/local/
+Manifest.toml
+*.ji

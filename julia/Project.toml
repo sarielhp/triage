@@ -1,0 +1,14 @@
+name = "Triage"
+uuid = "8b4e5670-630a-4d4b-8ee2-a73d2f95f469"
+authors = ["Sariel Har-Peled <sariel@gmail.com>"]
+version = "0.1.0"
+
+[compat]
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-63c0db5932d4"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[targets]
+test = ["Test", "Random"]

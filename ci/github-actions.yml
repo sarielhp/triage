@@ -1,0 +1,27 @@
+name: CI
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  cpp:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sanitize: [OFF, ON]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DTRIAGE_SANITIZERS=${{ matrix.sanitize }}
+      - run: cmake --build build --parallel 2
+      - run: ctest --test-dir build --output-on-failure
+  julia:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ['1.10', '1']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+      - run: julia --project=julia -e 'using Pkg; Pkg.test()'
