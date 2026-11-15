@@ -231,6 +231,7 @@
           <figcaption><span><strong>A rectangle with six letter-shaped holes.</strong> This mesh was computed by Triage.</span><span class="mesh-controls" hidden><button type="button" id="mesh-toggle" aria-pressed="true">Mesh</button><button type="button" id="vertices-toggle" aria-pressed="false">Vertices</button></span></figcaption>
         </figure>
         <p class="figure-note">Stencil lettering keeps each hole simple. Only original boundary vertices are used. <a href="https://github.com/sarielhp/triage/blob/main/julia/figures/triage-wordmark.jl">Reproduce this figure ↗</a></p>
+        <p class="lead">Triage draws on ideas from theoretical computational geometry, including monotone chains and implicit vertical decomposition, whose practical benefits emerge on sufficiently large inputs. Such polygons arise in GIS applications, for example in detailed country, state, and county boundaries.</p>
         <div class="stats">
           <div><span class="stat-number">3.8<span>×</span></span><p>Faster than Earcut<br>on large geographic rings</p></div>
           <div><span class="stat-number">6.8<span>×</span></span><p>Faster than Earcut<br>on geographic domains with holes</p></div>
