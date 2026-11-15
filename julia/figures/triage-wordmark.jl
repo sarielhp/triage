@@ -162,8 +162,9 @@ function write_svg(path, d, rings, triangles, width)
             io,
             "</g><g class=\"boundary\" fill=\"none\" stroke=\"black\" stroke-width=\"0.055\" stroke-linejoin=\"round\">",
         )
-        for ring in rings
-            println(io, "<polygon points=\"$(svg_points(ring))\"/>")
+        for (r, ring) in enumerate(rings)
+            fill = r == 1 ? "none" : "#daf4da"
+            println(io, "<polygon points=\"$(svg_points(ring))\" fill=\"$fill\"/>")
         end
         println(io, "</g><g class=\"vertices\" fill=\"blue\" style=\"display:none\">")
         for (x, y) in d.points
@@ -189,9 +190,10 @@ function write_ipe(path, d, rings, triangles, width)
             )
         end
         set_layer!(f, "boundary")
-        for ring in rings
+        for (r, ring) in enumerate(rings)
             boundary = [BCG.Point(20x+4, 20y+4) for (x, y) in ring]
-            draw_polygon!(f, boundary; stroke = :black, pen = Symbol("1.1"))
+            fill = r == 1 ? :none : Symbol("$(218/255) $(244/255) $(218/255)")
+            draw_polygon!(f, boundary; stroke = :black, fill, pen = Symbol("1.1"))
         end
     end
 end

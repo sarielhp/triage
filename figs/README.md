@@ -3,6 +3,7 @@
 A rectangle with six stencil letter-shaped holes, triangulated by Triage:
 89 original vertices, 99 triangles, and no added vertices. R and A have small
 stencil openings so each letter is a simple hole without an isolated island.
+The letter-shaped holes are shaded light green.
 
 - [SVG for the README/site](../docs/assets/triage-wordmark.svg)
 - [Vector PDF](triage-wordmark.pdf) and [editable Ipe](triage-wordmark.ipe)
