@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        sanitize: [OFF, ON]
+        sanitize: ['OFF', 'ON']
     steps:
       - uses: actions/checkout@v4
       - name: Configure

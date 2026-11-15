@@ -37,14 +37,14 @@ def metadata(inputs)
   cpu, = Open3.capture2('uname', '-a')
   { utc: Time.now.utc.to_s, revision: revision.strip, julia: julia.strip,
     compiler: compiler.lines.first&.strip, system: cpu.strip,
-    affinity_cpu: ENV['TRIAGE_CPU'],
+    affinity_cpu: ENV.fetch('TRIAGE_CPU', nil),
     inputs: inputs.to_h { |p| [File.basename(p), Digest::SHA256.file(p).hexdigest] } }
 end
 
 abort 'usage: time_corpora.rb BUILD INPUTS OUTPUT' unless ARGV.length == 3
 build, inputs, output = ARGV.map { |path| File.expand_path(path) }
 FileUtils.mkdir_p(output)
-paths = Dir.glob(File.join(inputs, '*.bin')).sort
+paths = Dir.glob(File.join(inputs, '*.bin'))
 raise 'no input corpora' if paths.empty?
 
 prefix = ENV.key?('TRIAGE_CPU') ? ['taskset', '-c', ENV.fetch('TRIAGE_CPU')] : []
@@ -56,6 +56,6 @@ paths.each do |input|
   julia = File.join(output, "#{label}-julia.csv")
   run!(*prefix, File.join(build, 'triage_bench'), 'bench', input, cpp)
   run!(*prefix, 'julia', File.join(ROOT, 'scripts/julia_corpus.jl'), 'bench', input, julia)
-  measurements.concat([[label, cpp], [label, julia]])
+  measurements.push([label, cpp], [label, julia])
 end
 summarize(measurements, output)

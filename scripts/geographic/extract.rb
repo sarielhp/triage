@@ -16,8 +16,9 @@ def gshhg_rings(path)
       id, n, flag = header[0, 3]
       bytes = io.read(8 * n)
       raise 'truncated GSHHG coordinates' unless bytes.bytesize == 8 * n
+
       yield({ source: 'gshhg', id: id.to_s, part: 0, raw_n: n,
-              level: flag & 255, exterior: true, offset: io.pos - 8 * n,
+              level: flag & 255, exterior: true, offset: io.pos - (8 * n),
               west: header[3], east: header[4], flags: flag }, bytes)
     end
   end
@@ -31,7 +32,7 @@ def dbf_names(path)
     [data[offset, 11].delete("\0"), data.getbyte(offset + 16)]
   end
   Array.new(count) do |i|
-    offset = header + i * size + 1
+    offset = header + (i * size) + 1
     fields.to_h do |name, width|
       value = data[offset, width].strip
       offset += width
@@ -44,18 +45,20 @@ def shape_parts(data)
   raise 'expected Polygon shape' unless data.unpack1('V') == 5
 
   parts, count = data[36, 8].unpack('VV')
-  raise 'bad Polygon record length' unless parts.positive? && data.bytesize == 44 + 4 * parts + 16 * count
+  raise 'bad Polygon record length' unless parts.positive? && data.bytesize == 44 + (4 * parts) + (16 * count)
+
   starts = data[44, 4 * parts].unpack('V*') + [count]
   raise 'bad part offsets' unless starts.first.zero? && starts.each_cons(2).all? { |a, b| b - a >= 4 }
-  point_offset = 44 + 4 * parts
+
+  point_offset = 44 + (4 * parts)
   starts.each_cons(2).with_index.map do |(first, last), part|
-    bytes = data[point_offset + first * 16, (last - first) * 16]
+    bytes = data[point_offset + (first * 16), (last - first) * 16]
     points = bytes.unpack('E*').each_slice(2).to_a
     # ESRI Polygon exterior rings are clockwise; the sign only classifies parts.
-    area = points.each_cons(2).sum { |a, b| a[0] * b[1] - a[1] * b[0] }
+    area = points.each_cons(2).sum { |a, b| (a[0] * b[1]) - (a[1] * b[0]) }
     magnitude = points.flatten.map(&:abs).max
-    bound = 64 * Float::EPSILON * points.length**2 * magnitude**2
-    area = points.each_cons(2).sum { |a, b| a[0].to_r * b[1].to_r - a[1].to_r * b[0].to_r } if area.abs <= bound
+    bound = 64 * Float::EPSILON * (points.length**2) * (magnitude**2)
+    area = points.each_cons(2).sum { |a, b| (a[0].to_r * b[1].to_r) - (a[1].to_r * b[0].to_r) } if area.abs <= bound
     [part, last - first, area.negative?, bytes]
   end
 end
@@ -65,10 +68,12 @@ def tiger_rings(path, source)
   File.open(path, 'rb') do |io|
     header = io.read(100)
     raise 'bad shapefile header' unless header.unpack1('N') == 9994 && header[24, 4].unpack1('N') * 2 == io.size
+
     until io.eof?
       record, words = io.read(8).unpack('NN')
       data = io.read(words * 2)
       raise 'truncated shape record' unless data.bytesize == words * 2
+
       name = names.fetch(record - 1)
       shape_parts(data).each do |part, n, exterior, bytes|
         yield({ source: source, id: name.fetch('GEOID'), name: name.fetch('NAME'),
@@ -78,16 +83,23 @@ def tiger_rings(path, source)
   end
 end
 
-def rings(scratch, &block)
-  gshhg_rings(File.join(scratch, 'gshhg/gshhs_f.b'), &block)
-  tiger_rings(File.join(scratch, 'states/tl_2026_us_state.shp'), 'states', &block)
-  tiger_rings(File.join(scratch, 'counties/tl_2026_us_county.shp'), 'counties', &block)
+def rings(scratch, &)
+  gshhg_rings(File.join(scratch, 'gshhg/gshhs_f.b'), &)
+  tiger_rings(File.join(scratch, 'states/tl_2026_us_state.shp'), 'states', &)
+  tiger_rings(File.join(scratch, 'counties/tl_2026_us_county.shp'), 'counties', &)
+end
+
+def size_stratum(count)
+  return 0 if count < 30_000
+  return 1 if count < 100_000
+
+  2
 end
 
 def select_rings(inventory)
-  inventory.select { |r| r[:exterior] && r[:level] < 5 && r[:raw_n] >= 5000 }
-           .group_by { |r| [r[:source], r[:raw_n] < 30_000 ? 0 : (r[:raw_n] < 100_000 ? 1 : 2)] }
-           .flat_map do |(source, _stratum), entries|
+  eligible = inventory.select { |r| r[:exterior] && r[:level] < 5 && r[:raw_n] >= 5000 }
+  groups = eligible.group_by { |r| [r[:source], size_stratum(r[:raw_n])] }
+  groups.flat_map do |(source, _stratum), entries|
     sorted = entries.sort_by { |r| [r[:raw_n], r[:id], r[:part]] }
     count = [source == 'gshhg' ? 4 : 2, sorted.length].min
     indices = count == 1 ? [0] : (0...count).map { |i| i * (sorted.length - 1) / (count - 1) }
@@ -142,7 +154,8 @@ if $PROGRAM_NAME == __FILE__
   end
   inventory.group_by { |r| r[:source] }.each do |source, entries|
     counts = entries.select { |r| r[:exterior] }.map { |r| r[:raw_n] }
-    puts "#{source}: #{entries.length} rings; exterior max #{counts.max}; >=10k #{counts.count { |n| n >= 10_000 }}; >=100k #{counts.count { |n| n >= 100_000 }}; >=1m #{counts.count { |n| n >= 1_000_000 }}"
+    strata = [10_000, 100_000, 1_000_000].map { |limit| counts.count { |n| n >= limit } }
+    puts "#{source}: #{entries.length} rings; exterior max #{counts.max}; size strata #{strata.join('/')}"
   end
   puts "Selected #{selected.length} standalone boundaries before timing."
 end

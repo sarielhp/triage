@@ -14,7 +14,7 @@ abort 'usage: check_corpora.rb BUILD INPUTS OUTPUT' unless ARGV.length == 3
 build, inputs, output = ARGV.map { |path| File.expand_path(path) }
 FileUtils.mkdir_p(output)
 executable = File.join(build, 'triage_bench')
-Dir.glob(File.join(inputs, '*.bin')).sort.each do |input|
+Dir.glob(File.join(inputs, '*.bin')).each do |input|
   label = File.basename(input, '.bin')
   cpp = File.join(output, "#{label}-cpp.bin")
   julia = File.join(output, "#{label}-julia.bin")

@@ -61,13 +61,13 @@ end
 def census_inventory
   path = File.join(File.dirname(ARGV[2]), 'inventory.csv.gz')
   Zlib::GzipReader.open(path) { |io| CSV.new(io, headers: true).read }
-      .reject { |r| r['source'] == 'gshhg' }
-      .group_by { |r| [r['source'], r['id']] }
+                  .reject { |r| r['source'] == 'gshhg' }
+                  .group_by { |r| [r['source'], r['id']] }
 end
 
 def select_census(scratch)
   groups = census_inventory.select do |_, rows|
-    rows.count { |r| r['exterior'] == 'true' } == 1 &&
+    rows.one? { |r| r['exterior'] == 'true' } &&
       rows.any? { |r| r['exterior'] == 'false' }
   end
   chosen = groups.sort_by { |key, rows| [-rows.sum { |r| r['raw_n'].to_i }, key] }.first(7).to_h
@@ -78,6 +78,7 @@ def select_census(scratch)
     tiger_rings(path, source) do |row, bytes|
       key = [source, row[:id]]
       next unless polygons.key?(key)
+
       polygons.fetch(key) << [row[:exterior], row[:part], bytes.unpack('E*').each_slice(2).to_a]
     end
   end
@@ -100,7 +101,7 @@ def write_cases(path, cases, metadata)
         bytes = [rings.length].pack('Q<')
         rings.each { |ring| bytes << [ring.length].pack('Q<') << ring.flatten.pack('E*') }
         io.write(bytes)
-        csv << row.first(6) + [rings.sum(&:length), rings.length - 1, Digest::SHA256.hexdigest(bytes)]
+        csv << (row.first(6) + [rings.sum(&:length), rings.length - 1, Digest::SHA256.hexdigest(bytes)])
       end
     end
   end

@@ -38,7 +38,7 @@ end
 if $PROGRAM_NAME == __FILE__
   scratch, output = ARGV
   raise 'pass existing ProjectTmp scratch directory and metadata output directory' unless File.directory?(scratch.to_s)
-  
+
   FileUtils.mkdir_p(output)
   CSV.open(File.join(output, 'provenance.csv'), 'w') do |csv|
     csv << %w[source archive url sha256 version license archive_bytes]

@@ -39,12 +39,14 @@ end
 unknown = ARGV - %w[--full --geography --sanitize]
 abort "unknown options: #{unknown.join(' ')}" unless unknown.empty?
 
-abort 'Use --sanitize separately from --full; sanitizer timings are not performance results.' if ARGV.include?('--sanitize') && ARGV.include?('--full')
+if ARGV.include?('--sanitize') && ARGV.include?('--full')
+  abort 'Use --sanitize separately from --full; sanitizer timings are not performance results.'
+end
 
 work = ProjectTmp.mktmpdir('verification')
 puts "Artifacts: #{work} (copy wanted results before the 24-hour temporary cleanup)"
 ENV['TMPDIR'] = File.join(work, 'tmp')
-FileUtils.mkdir_p(ENV['TMPDIR'])
+FileUtils.mkdir_p(ENV.fetch('TMPDIR', nil))
 build = File.join(work, 'build')
 options = ARGV.include?('--sanitize') ? ['-DTRIAGE_SANITIZERS=ON'] : []
 run!('cmake', '-S', ROOT, '-B', build, '-DCMAKE_BUILD_TYPE=Release', *options)
