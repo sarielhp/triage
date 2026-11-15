@@ -45,7 +45,9 @@ def metadata(inputs)
 end
 
 strategies = ARGV.delete('--strategies')
-abort 'usage: time_corpora.rb BUILD INPUTS OUTPUT [--strategies]' unless ARGV.length == 3
+triage_only = ARGV.delete('--triage-only')
+strategies ||= triage_only
+abort 'usage: time_corpora.rb BUILD INPUTS OUTPUT [--strategies|--triage-only]' unless ARGV.length == 3
 build, inputs, output = ARGV.map { |path| File.expand_path(path) }
 FileUtils.mkdir_p(output)
 paths = Dir.glob(File.join(inputs, '*.bin'))
@@ -55,11 +57,12 @@ prefix = ENV.key?('TRIAGE_CPU') ? ['taskset', '-c', ENV.fetch('TRIAGE_CPU')] : [
 File.write(File.join(output, 'environment.json'), JSON.pretty_generate(metadata(paths)))
 measurements = []
 action = strategies ? 'bench-strategies' : 'bench'
+cpp_action = triage_only ? 'bench-triage' : action
 paths.each do |input|
   label = File.basename(input, '.bin')
   cpp = File.join(output, "#{label}-cpp.csv")
   julia = File.join(output, "#{label}-julia.csv")
-  run!(*prefix, File.join(build, 'triage_bench'), action, input, cpp)
+  run!(*prefix, File.join(build, 'triage_bench'), cpp_action, input, cpp)
   run!(*prefix, 'julia', File.join(ROOT, 'scripts/julia_corpus.jl'), action, input, julia)
   measurements.push([label, cpp], [label, julia])
 end

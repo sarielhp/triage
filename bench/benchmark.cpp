@@ -29,15 +29,16 @@ double measure(const Corpus& corpus,unsigned mode,std::size_t reps) {
     if (mode==2) return measure<2>(corpus,reps);
     return mode==0?measure<0>(corpus,reps):measure<1>(corpus,reps);
 }
-void benchmark(const Corpus& corpus,const char* path,bool strategies=false) {
+void benchmark(const Corpus& corpus,const char* path,bool strategies=false,bool triage_only=false) {
     const char* names[]={"triage-cpp","earcut","triage-bounded-cpp"};
     const unsigned modes=strategies?3:2;
+    const auto method=[&](unsigned slot) { return triage_only?2*slot:slot; };
     std::ofstream out(path);
     if (!out) throw std::runtime_error("cannot open timing output");
     out<<"method,sample,repetitions,seconds_per_corpus\n"<<std::setprecision(17);
     double fastest=1e100,slowest=0;
     for (unsigned m=0;m<modes;++m) {
-        measure(corpus,m,1); const double pilot=measure(corpus,m,1);
+        measure(corpus,method(m),1); const double pilot=measure(corpus,method(m),1);
         fastest=std::min(fastest,pilot);slowest=std::max(slowest,pilot);
     }
     const auto reps=static_cast<std::size_t>(std::clamp(std::min(std::ceil(0.02/fastest),
@@ -45,13 +46,13 @@ void benchmark(const Corpus& corpus,const char* path,bool strategies=false) {
     std::vector<double> samples[3];
     for (unsigned round=0;round<12;++round) for (unsigned j=0;j<modes;++j) {
         const auto mode=(round+j)%modes;
-        const double time=measure(corpus,mode,reps);
+        const double time=measure(corpus,method(mode),reps);
         samples[mode].push_back(time);
-        out<<names[mode]<<','<<round+1<<','<<reps<<','<<time<<'\n';
+        out<<names[method(mode)]<<','<<round+1<<','<<reps<<','<<time<<'\n';
     }
     for (unsigned m=0;m<modes;++m) {
         auto& times=samples[m]; std::sort(times.begin(),times.end());
-        std::cout<<names[m]<<" polygons="<<corpus.size()<<" median_ms="<<500*(times[5]+times[6])<<'\n';
+        std::cout<<names[method(m)]<<" polygons="<<corpus.size()<<" median_ms="<<500*(times[5]+times[6])<<'\n';
     }
     if (!out) throw std::runtime_error("timing write failed");
 }
@@ -68,13 +69,25 @@ void dump(const Corpus& corpus,const char* path,bool bounded=false) {
 }
 int main(int argc,char** argv) {
     try {
-        if (argc!=4) throw std::runtime_error("usage: triage_bench bench|bench-strategies|dump|dump-bounded|validate|validate-bounded INPUT OUTPUT");
+        if (argc!=4) throw std::runtime_error("usage: triage_bench bench|bench-strategies|bench-triage|dump|dump-bounded|validate|validate-bounded|validate-earcut INPUT OUTPUT");
         const auto corpus=load(argv[2]);
         const std::string action=argv[1];
         if (action=="bench") benchmark(corpus,argv[3]);
         else if(action=="bench-strategies") benchmark(corpus,argv[3],true);
+        else if(action=="bench-triage") benchmark(corpus,argv[3],false,true);
         else if(action=="dump") dump(corpus,argv[3]);
         else if(action=="dump-bounded") dump(corpus,argv[3],true);
+        else if(action=="validate-earcut") {
+            for (const auto& p:corpus) {
+                const auto indices=mapbox::earcut<dd::Index>(p);
+                require(indices.size()%3==0,"invalid Earcut output length");
+                dd::Result mesh;
+                for (std::size_t i=0;i<indices.size();i+=3)
+                    mesh.triangles.push_back({indices[i],indices[i+1],indices[i+2]});
+                certify(p,mesh);
+            }
+            std::cout<<"PASS Earcut exact coverage: "<<corpus.size()<<" domains\n";
+        }
         else if(action=="validate" || action=="validate-bounded") {
             for (const auto& p:corpus) certify(p,action=="validate"?
                 dd::triangulate(p.points,p.offsets):dd::triangulate_bounded(p.points,p.offsets));
