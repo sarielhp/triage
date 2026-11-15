@@ -2,7 +2,14 @@
 
 Triage triangulates simple polygons with holes using **only the original vertices**.
 It includes a header-only C++17 library and a complete native Julia implementation.
-Both implement the same three-way dispatcher:
+
+On our large geographic benchmarks, C++ Triage was **3.8× faster for single-ring
+boundaries and 6.8× faster for domains with holes** than
+[Mapbox Earcut](https://github.com/mapbox/earcut.hpp). Performance varies by input;
+see the [results and measurement conditions](#results), including smaller inputs
+and the Julia implementation.
+
+Both implementations use the same three-way dispatcher:
 
 | Input | Algorithm |
 |---|---|
