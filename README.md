@@ -81,7 +81,7 @@ Its exact fallback uses `Rational{BigInt}`. It uses the same forward-walking
 chain search as the C++ dispatcher; C++ additionally exposes binary/galloping
 variants for experiments.
 
-## Input contract
+## Input format
 
 Supply a simple counterclockwise exterior, followed by simple clockwise holes.
 Holes must be disjoint and strictly inside the exterior. Ring offsets delimit
