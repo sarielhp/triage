@@ -1,0 +1,60 @@
+output_index,label,raw_rings,raw_vertices,prepared_vertices,holes,status,prepared_sha256
+0,bad-diagonals.json,1,11,0,0,nonconsecutive duplicate vertex,
+0,bad-hole.json,4,48,0,3,collinear reversal/backtracking remains after cleaning,
+0,boxy.json,5,69,0,4,rings 1 and 3 touch or intersect,
+1,building.json,1,15,14,0,accepted,5dca3356ecc471f6895dfd88c76641e1370a5de32b11a9fd3f1d3ed0a10a3e90
+0,collinear-diagonal.json,1,24,0,0,nonconsecutive duplicate vertex,
+0,degenerate.json,1,6,0,0,nonconsecutive duplicate vertex,
+2,dude.json,3,104,104,2,accepted,1b431df8fd9fbddf48bc84c6a9b6624e0a355859bf7c65b4c3200c9338e24a3b
+3,earcut.json,7,548,538,6,accepted,9a06dcf47705880543f44e1fd1e47008a911d773993a619f5b9abd8f3cf21faa
+0,eberly-3.json,3,76,0,2,rings 1 and 3 touch or intersect,
+4,eberly-6.json,16,1418,1400,15,accepted,124309ed0228dfdf4a2121e2b70ad101d1edda7ad50e81bd01ef30d7cfd7f8b0
+0,empty-square.json,2,8,0,1,rings 1 and 2 touch or intersect,
+5,filtered-bridge-jhl.json,5,22,21,4,accepted,8fb6025fff4dc81cab8205b4e571864a1ea1e255db3c1f8384852ffc6448136c
+6,hilbert.json,1,1027,820,0,accepted,d57d9d0571b77fc35d902ef9e00b67f6e7dd11a17849d65f8ce21ffb152f77d3
+0,hole-touching-outer.json,2,81,0,1,rings 1 and 2 touch or intersect,
+0,hourglass.json,1,6,0,0,nonconsecutive duplicate vertex,
+0,infinite-loop-jhl.json,2,6,0,1,rings 1 and 2 touch or intersect,
+0,issue107.json,2,14,0,1,fewer than three vertices,
+0,issue111.json,4,26,0,3,self-intersection at edges 1 and 3,
+0,issue119.json,5,16,0,4,rings 2 and 5 touch or intersect,
+0,issue131.json,3,15,0,2,rings 1 and 2 touch or intersect,
+0,issue142.json,2,14,0,1,rings 1 and 2 touch or intersect,
+0,issue147.json,4,30,0,3,rings 2 and 3 touch or intersect,
+0,issue149.json,2,16,0,1,nonconsecutive duplicate vertex,
+7,issue16.json,2,12,12,1,accepted,9d9a83c5e8acc5c6d8af33d54d7954c8f562af4197a7ba3ea954edf4e3230f32
+8,issue17.json,2,11,11,1,accepted,167bdd13b26cdfe149e47c0ef1a9a31942b77919c172615988aefc237242bd07
+0,issue186.json,1,83,0,0,collinear reversal/backtracking remains after cleaning,
+9,issue29.json,2,40,40,1,accepted,71cb9a0a287946580ab4dee80ee3773dcbc58bcdac0131bf14da28b788d7fd52
+10,issue34.json,8,135,127,7,accepted,5c172701a5c981567f7c0dfd04ece89250aeed32d4b9d48e374c0a9296c50d54
+11,issue35.json,30,820,790,29,accepted,4f7248cb33fbc6862964d3ff8d19f50a1d7ca40950c346da1e6e70e619f971dd
+0,issue45.json,3,10,0,2,rings 1 and 2 touch or intersect,
+12,issue52.json,6,107,100,5,accepted,accb98f0ba359d7e197671cf60be232168a4734e1198e14cf66169da5f9999ff
+0,issue83.json,3,200,0,2,fewer than three vertices,
+0,outside-ring.json,3,69,0,2,rings 1 and 2 touch or intersect,
+0,rain.json,8,2693,0,7,rings 1 and 7 touch or intersect,
+0,self-tangent-1.json,3,23,0,2,rings 1 and 3 touch or intersect,
+0,self-tangent-2.json,3,25,0,2,rings 1 and 2 touch or intersect,
+0,self-tangent-3.json,23,147,0,22,rings 1 and 12 touch or intersect,
+0,self-tangent-4.json,273,2616,0,272,rings 1 and 21 touch or intersect,
+0,self-touching.json,3,125,0,2,nonconsecutive duplicate vertex,
+0,shared-points.json,1,10,0,0,nonconsecutive duplicate vertex,
+0,simplified-us-border.json,2,126,0,1,self-intersection at edges 53 and 56,
+0,steiner.json,5,8,0,4,fewer than three vertices,
+0,touching-holes.json,8,57,0,7,rings 6 and 8 touch or intersect,
+0,touching-holes2.json,3,13,0,2,rings 2 and 3 touch or intersect,
+0,touching-holes3.json,27,109,0,26,rings 2 and 8 touch or intersect,
+0,touching-holes4.json,27,109,0,26,rings 2 and 3 touch or intersect,
+0,touching-holes5.json,53,213,0,52,rings 2 and 8 touch or intersect,
+0,touching-holes6.json,169,3001,0,168,rings 1 and 9 touch or intersect,
+0,touching2.json,2,10,0,1,rings 1 and 2 touch or intersect,
+0,touching3.json,3,18,0,2,rings 1 and 2 touch or intersect,
+0,touching4.json,5,16,0,4,rings 4 and 5 touch or intersect,
+0,water-huge.json,193,5667,0,192,nonconsecutive duplicate vertex,
+0,water-huge2.json,443,5488,0,442,nonconsecutive duplicate vertex,
+0,water-huge3.json,1444,12864,0,1443,rings 1 and 581 touch or intersect,
+0,water.json,10,2523,0,9,nonconsecutive duplicate vertex,
+0,water2.json,8,1235,0,7,collinear reversal/backtracking remains after cleaning,
+0,water3.json,6,212,0,5,rings 1 and 3 touch or intersect,
+0,water3b.json,3,32,0,2,rings 1 and 2 touch or intersect,
+0,water4.json,6,720,0,5,self-intersection at edges 76 and 82,

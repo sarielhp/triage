@@ -134,6 +134,10 @@ Each full run produces:
 - `timings/`: raw samples, environment metadata, and summary CSV;
 - `build/`: runnable tests, example, and comparison executable.
 
+Add `--sanitize` to a full run to check its corpora under ASan/UBSan; timings
+are deliberately skipped in that mode. Leak detection may need disabling
+(`ASAN_OPTIONS=detect_leaks=0`) in restricted debugging environments.
+
 Individual stages can be rerun with `download.rb`, `prepare_all.jl`,
 `check_corpora.rb`, and `time_corpora.rb`; each prints its argument contract.
 The benchmark consumes results, includes output/workspace allocation, and
@@ -145,8 +149,40 @@ indicative rather than a paired experiment. Julia timings include GC costs.
 
 ## Results
 
-Release measurements and exact verification records will be inserted here
-before publication.
+Measured November 15, 2026 on an Intel Core i7-11700, Linux x86-64,
+GCC 16.2.0 (`-O3 -DNDEBUG -ffp-contract=off`, without `-march=native`),
+Boost 1.92.0, Julia 1.13.3, one thread, CPU 2. Each number is the median
+time for the **whole corpus** after warmup; speedup is Earcut time / C++ Triage
+time. Lower time is better. These are measurements of this package, not
+numbers copied from the research implementation.
+
+| Corpus | Polygons | Vertices | C++ Triage (ms) | Julia Triage (ms) | Earcut C++ (ms) | C++ speedup |
+|---|---:|---:|---:|---:|---:|---:|
+| Single-ring tiles | 111539 | 1089415 | 44.369 | 93.229 | 46.451 | 1.05× |
+| Holed tiles | 5799 | 318887 | 37.170 | 58.035 | 44.270 | 1.19× |
+| Large geographic rings | 19 | 2351828 | 224.932 | 272.317 | 855.080 | 3.80× |
+| Geographic domains with holes | 10 | 244564 | 13.778 | 20.419 | 93.124 | 6.76× |
+| Accepted named fixtures | 12 | 3977 | 0.665 | 2.220 | 0.651 | 0.98× |
+| Synthetic holed domains | 36 | 457348 | 358.216 | 403.816 | 6386.496 | 17.83× |
+
+C++ Triage wins both tile batches and the large geographic batches in this
+run. It is about 2% slower on the accepted named fixtures. Julia remains
+competitive on large geometry, but loses to Earcut on the small-tile batches.
+The synthetic advantage should not be interpreted as representative of maps.
+Differences of only a few percent can vary with hardware and run conditions;
+raw min/max values are provided, and no statistical significance is claimed.
+
+**Verification:** 117,415 prepared domains, 4,466,019 vertices: C++/Julia
+outputs match byte for byte and pass independent exact coverage checks,
+with zero added vertices. The ASan/UBSan run passed 118,708 generated and
+corpus cases (the reference sweep limits corpus tests to 4,096 vertices);
+23 generated equal-x variants were explicitly skipped. Julia's generated
+package suite passed 867 assertions. Full-size geographic outputs were
+checked separately by the exact corpus validator.
+
+Source revisions, checksums, raw samples, eligibility ledgers, and logs:
+[results/2026-11-15](results/2026-11-15/README.md).
+
 
 ## Verification scope
 
@@ -161,7 +197,7 @@ and Julia to emit identical original-vertex triangles.
 
 Passing the **prepared valid subset** of the Earcut fixtures is not the same
 as passing Earcut's entire raw recovery suite. The ledgers preserve this
- distinction, including unsupported cases; no exclusions depend on timing.
+distinction, including unsupported cases; no exclusions depend on timing.
 
 ## Sources and licensing
 

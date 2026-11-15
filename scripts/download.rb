@@ -23,6 +23,8 @@ def download_tiles(destination)
 end
 
 abort 'usage: download.rb DESTINATION [--geography]' unless ARGV.length.between?(1, 2)
+abort 'unknown option' if ARGV[1] && ARGV[1] != '--geography'
+
 destination = File.expand_path(ARGV[0])
 FileUtils.mkdir_p(destination)
 download_tiles(destination)

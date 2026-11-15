@@ -34,7 +34,7 @@ def metadata(inputs)
   revision, = Open3.capture2('git', '-C', ROOT, 'rev-parse', 'HEAD')
   julia, = Open3.capture2('julia', '--version')
   compiler, = Open3.capture2(ENV.fetch('CXX', 'c++'), '--version')
-  cpu, = Open3.capture2('uname', '-a')
+  cpu, = Open3.capture2('uname', '-srmo')
   { utc: Time.now.utc.to_s, revision: revision.strip, julia: julia.strip,
     compiler: compiler.lines.first&.strip, system: cpu.strip,
     affinity_cpu: ENV.fetch('TRIAGE_CPU', nil),

@@ -1,0 +1,41 @@
+<run>/build/triage_bench dump <run>/inputs/fixtures.bin <run>/meshes/fixtures-cpp.bin
+julia <checkout>/scripts/julia_corpus.jl dump <run>/inputs/fixtures.bin <run>/meshes/fixtures-julia.bin
+julia <checkout>/scripts/julia_corpus.jl validate <run>/inputs/fixtures.bin <run>/meshes/fixtures-cpp.bin
+PASS exact coverage: 12 domains
+PASS fixtures: C++/Julia byte-identical; no added vertices
+<run>/build/triage_bench dump <run>/inputs/geographic-holes.bin <run>/meshes/geographic-holes-cpp.bin
+julia <checkout>/scripts/julia_corpus.jl dump <run>/inputs/geographic-holes.bin <run>/meshes/geographic-holes-julia.bin
+julia <checkout>/scripts/julia_corpus.jl validate <run>/inputs/geographic-holes.bin <run>/meshes/geographic-holes-cpp.bin
+PASS exact coverage: 10 domains
+PASS geographic-holes: C++/Julia byte-identical; no added vertices
+<run>/build/triage_bench dump <run>/inputs/geographic-single.bin <run>/meshes/geographic-single-cpp.bin
+julia <checkout>/scripts/julia_corpus.jl dump <run>/inputs/geographic-single.bin <run>/meshes/geographic-single-julia.bin
+julia <checkout>/scripts/julia_corpus.jl validate <run>/inputs/geographic-single.bin <run>/meshes/geographic-single-cpp.bin
+PASS exact coverage: 19 domains
+PASS geographic-single: C++/Julia byte-identical; no added vertices
+<run>/build/triage_bench dump <run>/inputs/synthetic-holes.bin <run>/meshes/synthetic-holes-cpp.bin
+julia <checkout>/scripts/julia_corpus.jl dump <run>/inputs/synthetic-holes.bin <run>/meshes/synthetic-holes-julia.bin
+julia <checkout>/scripts/julia_corpus.jl validate <run>/inputs/synthetic-holes.bin <run>/meshes/synthetic-holes-cpp.bin
+PASS exact coverage: 36 domains
+PASS synthetic-holes: C++/Julia byte-identical; no added vertices
+<run>/build/triage_bench dump <run>/inputs/tiles-holes.bin <run>/meshes/tiles-holes-cpp.bin
+julia <checkout>/scripts/julia_corpus.jl dump <run>/inputs/tiles-holes.bin <run>/meshes/tiles-holes-julia.bin
+julia <checkout>/scripts/julia_corpus.jl validate <run>/inputs/tiles-holes.bin <run>/meshes/tiles-holes-cpp.bin
+PASS exact coverage: 5799 domains
+PASS tiles-holes: C++/Julia byte-identical; no added vertices
+<run>/build/triage_bench dump <run>/inputs/tiles-single.bin <run>/meshes/tiles-single-cpp.bin
+julia <checkout>/scripts/julia_corpus.jl dump <run>/inputs/tiles-single.bin <run>/meshes/tiles-single-julia.bin
+julia <checkout>/scripts/julia_corpus.jl validate <run>/inputs/tiles-single.bin <run>/meshes/tiles-single-cpp.bin
+validated 10000
+validated 20000
+validated 30000
+validated 40000
+validated 50000
+validated 60000
+validated 70000
+validated 80000
+validated 90000
+validated 100000
+validated 110000
+PASS exact coverage: 111539 domains
+PASS tiles-single: C++/Julia byte-identical; no added vertices

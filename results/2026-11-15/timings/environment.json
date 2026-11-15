@@ -1,0 +1,20 @@
+{
+  "utc": "2026-11-15 19:52:04 UTC",
+  "revision": "3133f424f5bf6cfadbe3d6fba2fab5ecf48bf68d",
+  "julia": "julia version 1.13.3",
+  "compiler": "c++ (Debian 16.2.0-4) 16.2.0",
+  "system": "Linux 7.0.12+kali-amd64 #1 SMP PREEMPT_DYNAMIC Kali 7.0.12-2kali1 (2026-06-18) x86_64 GNU/Linux",
+  "affinity_cpu": "2",
+  "inputs": {
+    "fixtures.bin": "ee66f9b979ef8a5ac8d0b10005a61076b097f8d38830cbfac7cd6c5cf6397001",
+    "geographic-holes.bin": "a46bb1305c8fcae0588a659bb23da12de537caf93b8da97dbab989735bf56ad9",
+    "geographic-single.bin": "ca499480026cc8978c1b234433a4a6af605b35f72151b1c99d5e0603d8cd7900",
+    "synthetic-holes.bin": "a92ce1b35d28f3e5616b63551006e55e5c06e530aefce86a835b25b940607e2c",
+    "tiles-holes.bin": "b634ab329ac91ff64d7ebbfb2ef1cd06133a7050b1ea62012b5b592378f34b00",
+    "tiles-single.bin": "d8087fb501cc541508aff659b918d7e3b5ce3c491d8ed4a97b75d86ea9e13b94"
+  },
+  "cpu_model": "Intel Core i7-11700 @ 2.50GHz",
+  "cpp_flags": "-O3 -DNDEBUG -ffp-contract=off",
+  "boost": "1.92.0",
+  "julia_threads": 1
+}
