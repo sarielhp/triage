@@ -7,7 +7,7 @@ namespace triage {
 // Trusted simple polygonal domain: CCW exterior, CW disjoint interior holes.
 // Offsets delimit half-open rings in the flat coordinate array; no closing copy.
 // See README for the geometric and numerical preconditions. No Steiner points.
-template<bool Bounded=false>
+template<bool Bounded=false,bool Array=false>
 inline Result triangulate_dispatch(const std::vector<Point>& points,
                           const std::vector<Index>& offsets) {
     if (points.size()<3 || points.size()>=std::numeric_limits<Index>::max() ||
@@ -20,7 +20,7 @@ inline Result triangulate_dispatch(const std::vector<Point>& points,
     Result result;
     if (offsets.size()>2 && points.size()<=32 &&
         try_triangulate_lazy_holes(points,offsets,result)) return result;
-    return triangulate_chain_monotone<ChainSearch::Walk,false,Bounded>(points,offsets);
+    return triangulate_chain_monotone<ChainSearch::Walk,false,Bounded,Array>(points,offsets);
 }
 inline Result triangulate(const std::vector<Point>& points,const std::vector<Index>& offsets) {
     return triangulate_dispatch(points,offsets);
@@ -33,7 +33,7 @@ inline Result triangulate(const std::vector<Point>& points) {
 // Optional worst-case O(n + m log m) strategy, m = number of monotone chains.
 // Same input assumptions and small kernels; never selected by the default API.
 inline Result triangulate_bounded(const std::vector<Point>& points,const std::vector<Index>& offsets) {
-    return triangulate_dispatch<true>(points,offsets);
+    return triangulate_dispatch<true,true>(points,offsets);
 }
 inline Result triangulate_bounded(const std::vector<Point>& points) {
     if (points.size()>=std::numeric_limits<Index>::max())

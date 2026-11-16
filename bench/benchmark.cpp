@@ -17,7 +17,9 @@ template<unsigned Mode> double measure(const Corpus& corpus,std::size_t reps) {
     std::uint64_t checksum=0;
     const auto start=std::chrono::steady_clock::now();
     for (std::size_t r=0;r<reps;++r) for (const auto& p:corpus) {
-        if constexpr(Mode==1) checksum+=consume(mapbox::earcut<dd::Index>(p));
+        if constexpr(Mode==4) checksum+=consume(dd::triangulate_dispatch<true,false>(p.points,p.offsets).triangles);
+        else if constexpr(Mode==3) checksum+=consume(dd::triangulate_dispatch<true,true>(p.points,p.offsets).triangles);
+        else if constexpr(Mode==1) checksum+=consume(mapbox::earcut<dd::Index>(p));
         else if constexpr(Mode==2) checksum+=consume(dd::triangulate_bounded(p.points,p.offsets).triangles);
         else checksum+=consume(dd::triangulate(p.points,p.offsets).triangles);
     }
@@ -26,13 +28,15 @@ template<unsigned Mode> double measure(const Corpus& corpus,std::size_t reps) {
     return elapsed/reps;
 }
 double measure(const Corpus& corpus,unsigned mode,std::size_t reps) {
+    if (mode==4) return measure<4>(corpus,reps);
+    if (mode==3) return measure<3>(corpus,reps);
     if (mode==2) return measure<2>(corpus,reps);
     return mode==0?measure<0>(corpus,reps):measure<1>(corpus,reps);
 }
-void benchmark(const Corpus& corpus,const char* path,bool strategies=false,bool triage_only=false) {
-    const char* names[]={"triage-cpp","earcut","triage-bounded-cpp"};
+void benchmark(const Corpus& corpus,const char* path,bool strategies=false,bool triage_only=false,bool status=false) {
+    const char* names[]={"triage-cpp","earcut","triage-bounded-cpp","triage-array-cpp","triage-legacy-bounded-cpp"};
     const unsigned modes=strategies?3:2;
-    const auto method=[&](unsigned slot) { return triage_only?2*slot:slot; };
+    const auto method=[&](unsigned slot) { return status?4-slot:(triage_only?2*slot:slot); };
     std::ofstream out(path);
     if (!out) throw std::runtime_error("cannot open timing output");
     out<<"method,sample,repetitions,seconds_per_corpus\n"<<std::setprecision(17);
@@ -56,11 +60,12 @@ void benchmark(const Corpus& corpus,const char* path,bool strategies=false,bool 
     }
     if (!out) throw std::runtime_error("timing write failed");
 }
-void dump(const Corpus& corpus,const char* path,bool bounded=false) {
+void dump(const Corpus& corpus,const char* path,bool bounded=false,bool array=false) {
     std::ofstream out(path,std::ios::binary);
     write_value(out,std::uint64_t{0x484f4c4544554d31}); write_value(out,std::uint64_t(corpus.size()));
     for (const auto& p:corpus) {
-        const auto mesh=bounded?dd::triangulate_bounded(p.points,p.offsets):dd::triangulate(p.points,p.offsets);
+        const auto mesh=array?dd::triangulate_dispatch<true,true>(p.points,p.offsets):
+            (bounded?dd::triangulate_bounded(p.points,p.offsets):dd::triangulate(p.points,p.offsets));
         write_value(out,std::uint64_t(p.points.size()));write_value(out,std::uint64_t{0});
         write_value(out,std::uint64_t(mesh.triangles.size()));
         for (const auto& t:mesh.triangles) for (const auto i:t) write_value(out,i);
@@ -69,14 +74,16 @@ void dump(const Corpus& corpus,const char* path,bool bounded=false) {
 }
 int main(int argc,char** argv) {
     try {
-        if (argc!=4) throw std::runtime_error("usage: triage_bench bench|bench-strategies|bench-triage|dump|dump-bounded|validate|validate-bounded|validate-earcut INPUT OUTPUT");
+        if (argc!=4) throw std::runtime_error("usage: triage_bench bench|bench-strategies|bench-triage|bench-status|dump|dump-bounded|dump-array|validate|validate-bounded|validate-earcut INPUT OUTPUT");
         const auto corpus=load(argv[2]);
         const std::string action=argv[1];
         if (action=="bench") benchmark(corpus,argv[3]);
         else if(action=="bench-strategies") benchmark(corpus,argv[3],true);
         else if(action=="bench-triage") benchmark(corpus,argv[3],false,true);
+        else if(action=="bench-status") benchmark(corpus,argv[3],false,false,true);
         else if(action=="dump") dump(corpus,argv[3]);
         else if(action=="dump-bounded") dump(corpus,argv[3],true);
+        else if(action=="dump-array") dump(corpus,argv[3],true,true);
         else if(action=="validate-earcut") {
             for (const auto& p:corpus) {
                 const auto indices=mapbox::earcut<dd::Index>(p);

@@ -1,5 +1,6 @@
 #pragma once
 #include "small.hpp"
+#include "array_status.hpp"
 #include <chrono>
 #include <numeric>
 #include <set>
@@ -56,7 +57,7 @@ Index seek(Chain& c,double x,const std::vector<Point>& p,ChainMonotoneStats* sta
     return lo;
 }
 
-template<ChainSearch Mode,bool Measure=false,bool Balanced=false>
+template<ChainSearch Mode,bool Measure=false,bool Balanced=false,bool Array=false>
 class Sweep {
     const std::vector<Point>& p_;
     const std::vector<Index>& offsets_;
@@ -78,7 +79,9 @@ class Sweep {
         bool operator()(Probe a,Index b) const { return !sweep->below_point(b,a.vertex); }
     };
     struct EmptyStatus { explicit EmptyStatus(StatusLess) {} };
-    std::conditional_t<Balanced,std::set<Index,StatusLess>,EmptyStatus> status_{StatusLess{this}};
+    struct EmptyArray {};
+    std::conditional_t<Balanced && Array,ArrayStatus,EmptyArray> array_status_;
+    std::conditional_t<Balanced && !Array,std::set<Index,StatusLess>,EmptyStatus> status_{StatusLess{this}};
     // Live lower chains never cross. Their order is invariant while sweep_x_
     // changes; only insertion/removal changes the set. Queries advance fingers.
     bool lower_than(Index i,Index j) {
@@ -112,14 +115,16 @@ class Sweep {
         intervals_.push_back({low,high,helper,next,static_cast<Index>(active_.size()),pending});
         active_.push_back(id); owner_[low]=owner_[high]=id;
         if constexpr (Balanced) {
-            if (!status_.insert(id).second) throw std::runtime_error("duplicate status boundary");
+            if constexpr (Array) array_status_.insert(id,[&](Index a,Index b){return lower_than(a,b);});
+            else if (!status_.insert(id).second) throw std::runtime_error("duplicate status boundary");
         }
         if constexpr (Measure) stats_->max_active=std::max(stats_->max_active,active_.size());
         return id;
     }
     void remove(Index id) {
         if constexpr (Balanced) {
-            if (status_.erase(id)!=1) throw std::runtime_error("missing status boundary");
+            if constexpr (Array) array_status_.erase(id);
+            else if (status_.erase(id)!=1) throw std::runtime_error("missing status boundary");
         }
         const Index slot=intervals_[id].slot,last=active_.back(); active_.pop_back();
         if (slot<active_.size()) { active_[slot]=last; intervals_[last].slot=slot; }
@@ -143,7 +148,11 @@ class Sweep {
         if (intervals_[id].pending) add_diagonal(v,intervals_[id].helper);
     }
     Index below(Index v) {
-        if constexpr (Balanced) {
+        if constexpr (Balanced && Array) {
+            const Index best=array_status_.below([&](Index id){return below_point(id,v);});
+            if (best==none) throw std::runtime_error("missing sweep interval");
+            return best;
+        } else if constexpr (Balanced) {
             auto it=status_.lower_bound(Probe{v});
             if (it==status_.begin()) throw std::runtime_error("missing sweep interval");
             return *--it;
@@ -191,6 +200,7 @@ public:
                 events_[j].in=base+(j==first?last-first-1:j-first-1);
             }
         }
+        if constexpr (Balanced && Array) array_status_.reserve(2*events_.size());
         owner_.resize(chains_.size(),none);
         intervals_.reserve(events_.size()); diagonals_.reserve(events_.size()/2);
         active_.reserve(std::min<std::size_t>(events_.size(),64));
@@ -233,7 +243,9 @@ public:
     const auto& diagonals() const { return diagonals_; }
     const auto& chains() const { return chains_; }
     std::size_t capacity_bytes() const {
-        return chains_.capacity()*sizeof(Chain)+events_.capacity()*sizeof(Event)+intervals_.capacity()*sizeof(Interval)+
+        std::size_t status_bytes=0;
+        if constexpr (Balanced && Array) status_bytes=array_status_.capacity_bytes();
+        return status_bytes+chains_.capacity()*sizeof(Chain)+events_.capacity()*sizeof(Event)+intervals_.capacity()*sizeof(Interval)+
             (active_.capacity()+owner_.capacity())*sizeof(Index)+diagonals_.capacity()*sizeof(diagonals_[0]);
     }
 };
@@ -420,13 +432,13 @@ public:
 };
 }
 
-template<ChainSearch Mode=ChainSearch::Gallop,bool Measure=false,bool Balanced=false>
+template<ChainSearch Mode=ChainSearch::Gallop,bool Measure=false,bool Balanced=false,bool Array=false>
 Result triangulate_chain_monotone(const std::vector<Point>& p,const std::vector<Index>& offsets,
     ChainMonotoneStats* stats=nullptr,std::vector<std::pair<Index,Index>>* diagonals=nullptr) {
     using Clock=std::chrono::steady_clock;
     Clock::time_point before;
     if constexpr (Measure) { if (!stats) throw std::invalid_argument("stats required"); *stats={}; before=Clock::now(); }
-    chain_monotone_detail::Sweep<Mode,Measure,Balanced> sweep(p,offsets,stats); sweep.prepare();
+    chain_monotone_detail::Sweep<Mode,Measure,Balanced,Array> sweep(p,offsets,stats); sweep.prepare();
     if constexpr (Measure) { const auto now=Clock::now(); stats->prepare_seconds=std::chrono::duration<double>(now-before).count(); before=now; }
     sweep.run();
     if constexpr (Measure) { const auto now=Clock::now(); stats->sweep_seconds=std::chrono::duration<double>(now-before).count(); before=now; stats->workspace_capacity_bytes=sweep.capacity_bytes(); }

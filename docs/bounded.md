@@ -21,8 +21,13 @@ lazily. Active intervals are ordered by their lower boundary chains. A split
 event locates the predecessor of its vertex in this order. Insertion, deletion,
 and predecessor lookup take O(log(m+1)) comparisons each.
 
-C++ uses `std::set`; Julia uses a deterministic AVL tree with inline array
-records. Neither uses random priorities or offers only an expected-time bound.
+C++ uses a preallocated AVL tree, adapted from BasicCompGeometry's sweep-tree
+design. Parent links support iterative balancing, and interval-to-node handles
+allow deletion without geometric comparisons. At most two intervals are created
+per extremum, so allocating space for 2m records covers the whole sweep; slots
+need not be recycled. Julia retains its recursive AVL with inline array records:
+the new array backend is implemented there too, but its timings were mixed.
+Neither uses random priorities or offers only an expected-time bound.
 Comparisons use orientation predicates on original edges, with no division or
 computed ray-intersection coordinates. Two live lower chains cannot cross,
 so their relative order remains unchanged as the sweep advances. Removal and
@@ -125,5 +130,24 @@ with no holes and rectangles with many stacked holes, from 260 to 65,540
 vertices, with exact dyadic shears to resolve x-coordinate ties.
 
 `ChainMonotoneStats::workspace_capacity_bytes` remains a sum of retained vector
-capacities, not peak memory. In particular it excludes `std::set` allocations
-and the temporary arrays used to sort endpoint directions.
+capacities, not peak memory. It includes the new AVL arrays, but excludes
+the legacy `std::set` allocations and temporary endpoint-sorting arrays.
+
+## Comparing the status implementations
+
+The [array-status experiment](../results/2026-11-15-array-status/README.md)
+compares the previous and new bounded backends while retaining the same chains,
+helper updates, sorted face topology, predicates, and small-input kernels.
+The previous C++ `std::set` and Julia recursive AVL remain available internally
+for reproduction. `triangulate` continues to use the original default strategy.
+
+```sh
+TRIAGE_CPU=2 ruby scripts/time_corpora.rb BUILD INPUTS STATUS_TIMINGS --status
+ruby scripts/check_corpora.rb BUILD INPUTS ARRAY_MESHES --array
+```
+
+`--status` compares legacy bounded versus array bounded in each language;
+it does not run Earcut. `--array` certifies the array backend in both languages.
+The Julia candidate can also be exercised internally with
+`Triage.triangulate_dispatch(points, offsets, Val(true), Val(true))`.
+This is an experimental interface, not a second public dispatch policy.

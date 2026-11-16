@@ -11,11 +11,14 @@ def run!(*args)
 end
 
 bounded = ARGV.delete('--bounded')
-abort 'usage: check_corpora.rb BUILD INPUTS OUTPUT [--bounded]' unless ARGV.length == 3
+array = ARGV.delete('--array')
+abort 'choose only one mesh mode' if bounded && array
+abort 'usage: check_corpora.rb BUILD INPUTS OUTPUT [--bounded|--array]' unless ARGV.length == 3
 build, inputs, output = ARGV.map { |path| File.expand_path(path) }
 FileUtils.mkdir_p(output)
 executable = File.join(build, 'triage_bench')
 action = bounded ? 'dump-bounded' : 'dump'
+action = 'dump-array' if array
 Dir.glob(File.join(inputs, '*.bin')).each do |input|
   label = File.basename(input, '.bin')
   cpp = File.join(output, "#{label}-cpp.bin")

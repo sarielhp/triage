@@ -1,0 +1,6 @@
+PASS fixtures: both defaults reproduce published meshes byte for byte
+PASS geographic-holes: both defaults reproduce published meshes byte for byte
+PASS geographic-single: both defaults reproduce published meshes byte for byte
+PASS synthetic-holes: both defaults reproduce published meshes byte for byte
+PASS tiles-holes: both defaults reproduce published meshes byte for byte
+PASS tiles-single: both defaults reproduce published meshes byte for byte

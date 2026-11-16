@@ -247,7 +247,7 @@
           <article><span class="method-number">03</span><h3>Larger inputs</h3><p>Sweep monotone chains, insert diagonals between original vertices, and triangulate compact boundary ranges.</p></article>
         </div>
         <p class="section-link"><a href="https://github.com/sarielhp/triage/blob/main/docs/algorithm.md">Read how chain-monotone triangulation works ↗</a></p>
-        <p class="lead">Also available in C++ and Julia: <code>triangulate_bounded</code>, a separate strategy with an O(n log n) worst-case time bound. It uses a balanced sweep status and sorted endpoint directions. It was 1.7–1.9× slower than the default on our C++ geographic batches, but substantially faster on adversarial inputs. The default stays unchanged. <a href="https://github.com/sarielhp/triage/blob/main/docs/bounded.md">Algorithm and comparison ↗</a></p>
+        <p class="lead">Also available in C++ and Julia: <code>triangulate_bounded</code>, a separate strategy with an O(n log n) worst-case time bound. It uses a balanced sweep status and sorted endpoint directions. The C++ version now combines Triage's chains with a BCG-style preallocated AVL tree: about 9% less time on large geographic rings and 39% less on the largest comb than the previous bounded backend. Julia's corresponding experiment was mixed, so its public backend stays unchanged. <a href="https://github.com/sarielhp/triage/blob/main/results/2026-11-15-array-status/README.md">Measurements ↗</a> · <a href="https://github.com/sarielhp/triage/blob/main/docs/bounded.md">Algorithm ↗</a></p>
       </section>
       <section id="results" class="section" aria-labelledby="results-title">
         <div class="section-heading"><p class="eyebrow">02 / THE MEASUREMENTS</p><h2 id="results-title">Measured, with the<br>data to reproduce it.</h2></div>
@@ -273,7 +273,7 @@
 <tr><th scope="row">64 stacked holes</th><td>260</td><td>0.572</td><td>0.240</td><td>0.667</td></tr>
 <tr><th scope="row">256 stacked holes</th><td>1028</td><td>2.576</td><td>1.189</td><td>39.070</td></tr>
 <tr><th scope="row">1,024 stacked holes</th><td>4100</td><td>14.105</td><td>5.260</td><td>2691.557</td></tr></tbody></table></div>
-        <p class="lead">The bounded variant is about 40× faster than default Triage on the largest comb, while Earcut remains much faster there. At 1,024 stacked holes, bounded Triage is about 512× faster than Earcut. The largest Earcut runs were stopped or omitted; no missing timings are extrapolated.</p>
+        <p class="lead">These original measurements use the previous C++ bounded backend, before the array-tree optimization. It is about 40× faster than default Triage on the largest comb, while Earcut remains much faster there. At 1,024 stacked holes, it is about 512× faster than Earcut. The largest Earcut runs were stopped or omitted; no missing timings are extrapolated.</p>
         <a class="text-link" href="https://github.com/sarielhp/triage#worst-case-inputs">Both families, all sizes, Julia results, and reproduction commands ↗</a>
       </section>
       <section id="start" class="section" aria-labelledby="start-title">

@@ -77,6 +77,8 @@ function link_chains!(s, start, first, last)
     return nothing
 end
 
+status_prepare!(status, capacity) = nothing
+
 function prepare_sweep(p, o, status = nothing)
     check_shape(p, o)
     all(q -> all(isfinite, q) && max(abs(q[1]), abs(q[2])) < 1e12, p) ||
@@ -96,6 +98,7 @@ function prepare_sweep(p, o, status = nothing)
     for r in 1:(length(o)-1)
         ring_events!(s, o[r], o[r+1]-1)
     end
+    status_prepare!(status, 2length(s.events))
     resize!(s.fingers, length(s.chains))
     fill!(s.fingers, 0)
     resize!(s.owner, length(s.chains))

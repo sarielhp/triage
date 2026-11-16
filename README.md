@@ -43,6 +43,13 @@ See [the algorithm, bound, and reproduction commands](docs/bounded.md).
 The [worst-case input examples](#worst-case-inputs) show why we provide both
 strategies: their practical performance depends strongly on the geometry.
 
+The C++ bounded sweep now uses a preallocated AVL tree with deletion by handle,
+adapted from [BasicCompGeometry](https://github.com/sarielhp/BasicCompGeometry.jl).
+It retains Triage's chain compression. In a direct comparison, this reduced
+time by about **9% on large geographic rings and 39% on the largest comb**.
+Julia's corresponding experiment gave mixed results, so its public backend
+is unchanged. See [the measurements and reproduction commands](results/2026-11-15-array-status/README.md).
+
 ## C++
 
 Requires GCC or Clang with C++17 and Boost headers (1.65+). No compiled Boost
@@ -221,7 +228,7 @@ Source revisions, checksums, raw samples, eligibility ledgers, and logs:
 ### Optional bounded-time strategy
 
 The separate `triangulate_bounded` API is available on `main` (it postdates
-v0.1.0). A fresh comparison on the same machine and corpora gives these
+v0.1.0). The initial comparison, before the C++ array-tree optimization, gives these
 **whole-corpus median timings in milliseconds**, with 12 samples per method:
 
 | Corpus | C++ default (ms) | C++ bounded (ms) | Earcut C++ (ms) |
@@ -238,8 +245,14 @@ The bounded variant is slower on these geographic and tile batches, but
 alternative; the default remains unchanged. See the
 [full C++/Julia results, adversarial cases, and verification](results/2026-11-15-bounded/README.md)
 and the [running-time argument](docs/bounded.md).
+The [subsequent array-tree comparison](results/2026-11-15-array-status/README.md)
+reports the current C++ backend against this previous implementation.
 
 ## Worst-case inputs
+
+The timings below preserve the original comparison using the previous C++
+bounded backend. Its current array-tree replacement reduces the largest comb
+time further; see the [direct before/after experiment](results/2026-11-15-array-status/README.md).
 
 The following adversarial families expose different weaknesses in default
 Triage and Earcut. They are deliberately constructed examples, not a

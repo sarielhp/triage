@@ -197,8 +197,8 @@ function build_sorted_faces(p, o, marks, diagonals)
     return f
 end
 
-function chain_monotone_bounded(p::Vector{Point}, o::Vector{Int})
-    s = prepare_sweep(p, o, BalancedStatus())
+function chain_monotone_bounded(p::Vector{Point}, o::Vector{Int}, status = BalancedStatus())
+    s = prepare_sweep(p, o, status)
     sweep!(s)
     marks = [e.v for e in s.events]
     for (a, b) in s.diagonals

@@ -44,10 +44,12 @@ def metadata(inputs)
                 .to_h { |p| [p.delete_prefix("#{ROOT}/"), Digest::SHA256.file(p).hexdigest] } }
 end
 
+status = ARGV.delete('--status')
 strategies = ARGV.delete('--strategies')
 triage_only = ARGV.delete('--triage-only')
+abort 'choose only one timing mode' if [status, strategies, triage_only].compact.length > 1
 strategies ||= triage_only
-abort 'usage: time_corpora.rb BUILD INPUTS OUTPUT [--strategies|--triage-only]' unless ARGV.length == 3
+abort 'usage: time_corpora.rb BUILD INPUTS OUTPUT [--strategies|--triage-only|--status]' unless ARGV.length == 3
 build, inputs, output = ARGV.map { |path| File.expand_path(path) }
 FileUtils.mkdir_p(output)
 paths = Dir.glob(File.join(inputs, '*.bin'))
@@ -57,6 +59,7 @@ prefix = ENV.key?('TRIAGE_CPU') ? ['taskset', '-c', ENV.fetch('TRIAGE_CPU')] : [
 File.write(File.join(output, 'environment.json'), JSON.pretty_generate(metadata(paths)))
 measurements = []
 action = strategies ? 'bench-strategies' : 'bench'
+action = 'bench-status' if status
 cpp_action = triage_only ? 'bench-triage' : action
 paths.each do |input|
   label = File.basename(input, '.bin')

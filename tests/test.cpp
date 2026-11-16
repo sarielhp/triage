@@ -22,6 +22,8 @@ void check_chain(const Polygon& p) {
         const auto balanced=dd::triangulate_chain_monotone<dd::ChainSearch::Walk,true,true>(
             p.points,p.offsets,&balanced_stats,&balanced_diagonals);
         certify(p,balanced);
+        const auto array=dd::triangulate_chain_monotone<dd::ChainSearch::Walk,false,true,true>(p.points,p.offsets);
+        require(array.triangles==balanced.triangles,"array status changes triangulation");
         certify(p,dd::triangulate_bounded(p.points,p.offsets));
         for (auto& d:balanced_diagonals) if (d.first>d.second) std::swap(d.first,d.second);
         std::sort(balanced_diagonals.begin(),balanced_diagonals.end());
@@ -84,9 +86,30 @@ void check_fan_topology() {
         }
     }
 }
+void check_array_status() {
+    dd::chain_monotone_detail::ArrayStatus tree;
+    constexpr unsigned n=257;
+    tree.reserve(4*n);
+    std::set<dd::Index> live;
+    std::mt19937 rng(56273);
+    std::vector<dd::Index> keys(n); std::iota(keys.begin(),keys.end(),0);
+    for (unsigned round=0;round<8;++round) {
+        std::shuffle(keys.begin(),keys.end(),rng);
+        for (auto key:keys) {
+            if (round%2==0) { tree.insert(key,std::less<dd::Index>{}); live.insert(key); }
+            else { tree.erase(key); live.erase(key); }
+            for (unsigned q=0;q<=n;++q) {
+                auto it=live.lower_bound(q);
+                const auto expected=it==live.begin()?dd::chain_monotone_detail::none:*--it;
+                require(tree.below([&](dd::Index id){return id<q;})==expected,"array AVL predecessor mismatch");
+            }
+        }
+    }
+}
 int main(int argc,char** argv) {
+
     try {
-        check_cursors(); check_fan_topology(); std::mt19937 rng(15152026);
+        check_array_status(); check_cursors(); check_fan_topology(); std::mt19937 rng(15152026);
         for (unsigned holes=0;holes<=20;++holes) for (unsigned repeat=0;repeat<20;++repeat) {
             Polygon p; p.offsets.push_back(0); ring(p,radial(4+repeat%17,15,15,80,false,rng),repeat);
             for (unsigned h=0;h<holes;++h) ring(p,radial(3+(repeat+h)%6,10*(h%5),10*(h/5),2,true,rng),repeat+h);

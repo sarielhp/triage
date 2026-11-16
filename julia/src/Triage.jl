@@ -9,6 +9,7 @@ include("small.jl")
 include("chains.jl")
 include("faces.jl")
 include("bounded.jl")
+include("array_status.jl")
 
 """
     triangulate(points::Vector{Point}, offsets=[1,length(points)+1])
@@ -38,7 +39,12 @@ function triangulate_bounded(
     return triangulate_dispatch(points, offsets, Val(true))
 end
 
-function triangulate_dispatch(points, offsets, ::Val{Bounded}) where {Bounded}
+function triangulate_dispatch(
+    points,
+    offsets,
+    ::Val{Bounded},
+    ::Val{UseArray} = Val(false),
+) where {Bounded,UseArray}
     check_shape(points, offsets)
     if length(offsets) == 2 && length(points) <= 64
         return small_polygon(points)
@@ -47,8 +53,11 @@ function triangulate_dispatch(points, offsets, ::Val{Bounded}) where {Bounded}
         result = lazy_holes(points, offsets)
         isnothing(result) || return result
     end
-    return Bounded ? chain_monotone_bounded(points, offsets) :
-           chain_monotone(points, offsets)
+    if Bounded
+        status = UseArray ? ArrayStatus() : BalancedStatus()
+        return chain_monotone_bounded(points, offsets, status)
+    end
+    return chain_monotone(points, offsets)
 end
 
 function check_shape(points, offsets)

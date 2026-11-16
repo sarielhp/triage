@@ -1,0 +1,18 @@
+generated=1330 equal_x_skipped=23
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/comb-1024.bin checked=0
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/comb-16384.bin checked=0
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/comb-256.bin checked=1
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/comb-4096.bin checked=0
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/comb-64.bin checked=1
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/fixtures.bin checked=12
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/geographic-holes.bin checked=0
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/geographic-single.bin checked=0
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/stacked-holes-1024.bin checked=0
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/stacked-holes-16384.bin checked=0
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/stacked-holes-256.bin checked=1
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/stacked-holes-4096.bin checked=0
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/stacked-holes-64.bin checked=1
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/synthetic-holes.bin checked=28
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/tiles-holes.bin checked=5799
+/tmp/sariel/triage/array-status/20261115-180027-20261115-2-vy06y8/inputs/tiles-single.bin checked=111539
+PASS cases=118712 equal_x_skipped=23

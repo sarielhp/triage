@@ -12,7 +12,23 @@ function check_avl(t, i, ids)
     return height
 end
 
-@testset "AVL insert/delete invariants" begin
+function check_avl(t::Triage.ArrayStatus, i, ids, parent = 0)
+    i == 0 && return 0
+    @test t.parent[i] == parent
+    @test t.slot[t.key[i]] == i
+    lh = check_avl(t, t.left[i], ids, i)
+    push!(ids, t.key[i])
+    rh = check_avl(t, t.right[i], ids, i)
+    @test abs(lh-rh) <= 1
+    @test t.height[i] == 1+max(lh, rh)
+    return t.height[i]
+end
+
+@testset "AVL insert/delete invariants" for status in (
+    Triage.BalancedStatus(),
+    Triage.ArrayStatus(514),
+)
+
     n = 257
     p = Point[]
     for j in 1:n
@@ -29,7 +45,7 @@ end
         Int[],
         Int[],
         Tuple{Int,Int}[],
-        Triage.BalancedStatus(),
+        status,
     )
     live = Set{Int}()
     rng = MersenneTwister(56173)
@@ -58,6 +74,11 @@ end
         Triage.sweep!(scan)
         Triage.sweep!(tree)
         @test scan.diagonals == tree.diagonals
+        array = Triage.prepare_sweep(d.points, d.offsets, Triage.ArrayStatus())
+        Triage.sweep!(array)
+        @test array.diagonals == tree.diagonals
+        @test Triage.chain_monotone_bounded(d.points, d.offsets, Triage.ArrayStatus()) ==
+              Triage.chain_monotone_bounded(d.points, d.offsets)
     end
     p = Point[(0, 0), (4, 0), (5, 4), (1, 5), (1.5, 1), (2, 2), (3, 1)]
     @test length(triangulate(p, [1, 5, 8])) == 7

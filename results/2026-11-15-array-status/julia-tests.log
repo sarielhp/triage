@@ -1,0 +1,6 @@
+Test Summary:                |   Pass   Total  Time
+AVL insert/delete invariants | 265224  265224  0.4s
+Test Summary:                |   Pass   Total  Time
+AVL insert/delete invariants | 529420  529420  0.2s
+Test Summary:       | Pass  Total  Time
+Triage native Julia | 3015   3015  2.9s

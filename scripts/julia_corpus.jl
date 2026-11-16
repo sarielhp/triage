@@ -72,9 +72,16 @@ function benchmark(corpus, path)
     )
 end
 
-function benchmark_strategies(corpus, path)
-    methods = (triangulate, triangulate_bounded)
-    names = ("julia", "triage-bounded-julia")
+array_triangulate(p, o = [1, length(p)+1]) =
+    Triage.triangulate_dispatch(p, o, Val(true), Val(true))
+
+function benchmark_strategies(corpus, path, status = false)
+    methods =
+        status ? (triangulate_bounded, array_triangulate) :
+        (triangulate, triangulate_bounded)
+    names =
+        status ? ("triage-bounded-julia", "triage-array-julia") :
+        ("julia", "triage-bounded-julia")
     pilots = Float64[]
     for method in methods
         method(Point[(0, 0), (2, 0), (1, 1)])
@@ -105,17 +112,21 @@ function benchmark_strategies(corpus, path)
 end
 
 length(ARGS) == 3 || error(
-    "usage: julia_corpus.jl dump|dump-bounded|validate|bench|bench-strategies INPUT OUTPUT",
+    "usage: julia_corpus.jl dump|dump-bounded|dump-array|validate|bench|bench-strategies|bench-status INPUT OUTPUT",
 )
 corpus = read_corpus(ARGS[2])
 if ARGS[1] == "dump"
     dump_corpus(corpus, ARGS[3])
 elseif ARGS[1] == "dump-bounded"
     dump_corpus(corpus, ARGS[3], triangulate_bounded)
+elseif ARGS[1] == "dump-array"
+    dump_corpus(corpus, ARGS[3], array_triangulate)
 elseif ARGS[1] == "validate"
     validate_corpus(corpus, ARGS[3])
 elseif ARGS[1] == "bench"
     benchmark(corpus, ARGS[3])
+elseif ARGS[1] == "bench-status"
+    benchmark_strategies(corpus, ARGS[3], true)
 elseif ARGS[1] == "bench-strategies"
     benchmark_strategies(corpus, ARGS[3])
 else
